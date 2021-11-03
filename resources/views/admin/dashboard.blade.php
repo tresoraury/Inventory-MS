@@ -5,7 +5,7 @@
 
 
 @section('title')
-  Dashboard | regideso
+  ACCEUIL ...
 
 @endsection
 
@@ -112,7 +112,7 @@ b{
             </div>
           </div>
 
-          <b> QUELQUES PRODUITS QUE L'ENTREPRISE A EN STOCK </b>
+          <b> PRODUITS D'UN STOCK </b>
 </div>
          
 
@@ -135,9 +135,6 @@ b{
     </ul>
   </div>
   <div class="card-body">
-    <h4 class="card-title">Cette application est pour la gestion de la REGIDESO</h4>
-    <p class="card-text">Ci-dessous il y a un lien du site web de la REGIDESO</p>
-    <a href="https://www.regideso.bi/" class="btn btn-primary">REGIDESO WEB</a>
   </div>
 </div>
 

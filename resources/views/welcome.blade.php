@@ -95,7 +95,7 @@
 
     </head>
 
- <h1> REGIDESO STOCK MANAGEMENT</h1>
+ <h1>STOCK MANAGEMENT</h1>
  <p> Veuiller Clicker sur connection pour vous connecter</p>
 
         
@@ -117,8 +117,5 @@
                 
             
         </div>
-        <div class="card">
-        <img class="card_image" src="photo.jpg" width="200px">
-    </div>
     </body>
 </html>

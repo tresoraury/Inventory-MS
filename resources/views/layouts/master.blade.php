@@ -29,10 +29,9 @@
         Tip 1: You can change the color of the sidebar using: data-color="blue | green | orange | red | yellow"
     -->
       <div class="logo">
-        <img class="card_image" src="photo.jpg" width="100px">
+        <img class="card_image" src="photo.jpg" width="150px">
         <br>
         <a href="http://www.creative-tim.com" class="fa fa-shopping-cart" style:width:50px>
-          MAGASIN REGIDESO
         </a>
       </div>
       <div class="sidebar-wrapper" id="sidebar-wrapper">
