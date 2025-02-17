@@ -14,15 +14,12 @@ class AdminMiddleware
      * @return mixed
      */
     public function handle($request, Closure $next)
-    {
-        if(Auth::user()->usertype == 'admin')
-        {
+{
+    if (Auth::check() && Auth::user()->usertype == 'admin') {
         return $next($request);
-        }
-        else
-        {
-        return redirect('/home')->with('status','vous n etes pas autorise');
-        }
-        
+    } else {
+        \Log::info('User is not an admin:', ['user' => Auth::user()]);
+        return redirect('/home')->with('status', 'vous n etes pas autorise');
     }
+}
 }

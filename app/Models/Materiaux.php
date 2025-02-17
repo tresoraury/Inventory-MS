@@ -9,4 +9,9 @@ class Materiaux extends Model
      public $timestamps = false;
     protected $table = 'materiaux';
     protected $fillable = ['No_code','designation','unite_emploie','rangement','quantite'];
+
+    public function operations()
+    {
+        return $this->hasMany(Produits::class, 'materiel_id');
+    }
 }

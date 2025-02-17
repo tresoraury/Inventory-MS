@@ -1,5 +1,8 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\InputOperationController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -16,16 +19,17 @@ Route::get('/', function () {
 });
 
 
-Auth::routes();
+//Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+//Route::get('/home', 'HomeController@index')->name('home');
 
-route::group(['middleware' => ['auth','admin']], function () {
-Route::get('/dashboard', function () {
-    return view('admin.dashboard');
-});
+Route::group(['middleware' => ['auth', 'admin']], function () {
+    Route::get('/dashboard', function () {
+        return view('admin.dashboard');
+    });
 
 Route::get('/role-register','Admin\DashboardController@registered');
+
 
 Route::get('/role-edit/{id}','Admin\DashboardController@registeredit');
 Route::put('/role-register-update/{id}','Admin\DashboardController@registerupdate');
@@ -61,14 +65,19 @@ Route::get('/partenaire-create','Admin\PartenaireController@create');
 Route::post('/partenaire-store','Admin\PartenaireController@store');
 
 
-Route::get('/prnpriview','Admin\StocksController@indexx');
-Route::get('/printPreview','Admin\StocksController@printPreview');
+Route::get('/prnpriview/stocks','Admin\StocksController@indexx');
+Route::get('/printPreview/stocks','Admin\StocksController@printPreview');
 
-Route::get('/prnpriview','Admin\MagasinController@indexx');
-Route::get('/printPreview','Admin\MagasinController@printPreview');
+Route::get('/print-preview/magasin', 'Admin\MagasinController@indexx')->name('magasin.preview');
+Route::get('/print-preview/materiaux', 'Admin\MateriauxreController@indexx')->name('materiaux.preview');
 
-Route::get('/prnpriview','Admin\MateriauxreController@indexx');
-Route::get('/printPreview','Admin\MateriauxreController@printPreview');
+Route::get('/input-operations', [InputOperationController::class, 'index'])->name('input.operations.index');
+
 });
 
  
+Auth::routes();
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+//Route::post('/login', [App\Http\Controllers\Auth\LoginController::class, 'login'])->name('login');

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\OperationType;
 use App\Models\Produits;
 use App\Models\Materiaux;
 use Session;
@@ -13,42 +14,62 @@ class MagasinController extends Controller
     public function index()
     {
     	$materiaux = Materiaux::all();
-    	$magasin = Produits::all();
+    	$magasin = Produits::with(['materiel', 'type'])->get();
     	return view('admin.magasin.index')
         ->with('materiaux',$materiaux)
-        ->with('magasin',$magasin)
-        ;
+        ->with('magasin',$magasin);
     }
-
     public function create()
     {
-        $materiaux = Materiaux::all();
-        $magasin = Produits::all();
+        $materiaux = Materiaux::all(); // Retrieve all products
+        $operationTypes = OperationType::all();
         return view('admin.magasin.create')
-        ->with('materiaux',$materiaux)
-        ->with('magasin',$magasin)
-        ;
+        ->with('materiaux', $materiaux)
+        ->with('operationTypes', $operationTypes);
     }
-
+    
     public function store(Request $request)
     {
-        $magasin = Produits::all();
-        $produit = new produits();
-    	$produit->materiel_id = $request->input('materiel_id');
-    	$produit->type_operation = $request->input('type_operation');
-    	$produit->designation = $request->input('designation');
-    	$produit->partenaire = $request->input('partenaire');
-    	$produit->date_operation = $request->input('date_operation');
-        $produit->quantite = $request->input('quantite');
-    	$produit->save();
-        
-        Session::flash('statuscode','succes');
-    	return redirect('/magasin')->with('status','OPPEATION EFFECTUE AVEC SUCCES');
-    }
+        // Validate data
+        $request->validate([
+            'materiel_id' => 'required|exists:materiaux,id',
+            'type_operation' => 'required',
+            'designation' => 'required',
+            'partenaire' => 'required',
+            'date_operation' => 'required|date',
+            'quantite' => 'required|integer|min:1',
+        ]);
 
+        // New Product
+        $produit = new Produits();
+        $produit->materiel_id = $request->input('materiel_id'); 
+        $produit->type_operation = $request->input('type_operation');
+        $produit->designation = $request->input('designation');
+        $produit->partenaire = $request->input('partenaire');
+        $produit->date_operation = $request->input('date_operation');
+        $produit->quantite = $request->input('quantite');
+        $produit->save();
+
+        // Quantity Update
+        $materiel = Materiaux::find($request->input('materiel_id'));
+        if ($materiel) {
+            $materiel->quantite -= $produit->quantite;
+            $materiel->save();
+        }
+
+        if ($request->input('type_operation') === 'entree') {
+            InputOperation::create([
+                'materiel_id' => $request->input('materiel_id'),
+                'quantite' => $produit->quantite
+            ]);
+        }
+        
+        Session::flash('statuscode', 'success');
+        return redirect('/magasin')->with('status', 'OPERATION EFFECTUE AVEC SUCCES');
+    }
     public function indexx()
     {
-        $magasin = Produits::all();
+        $magasin = Produits::with(['materiel', 'type'])->get();
         return view('admin.magasin.printPreview')->with('magasin',$magasin);      
     }
 

@@ -13,15 +13,19 @@ class CreateOperationssTable extends Migration
      */
     public function up()
     {
-        Schema::create('operationss', function (Blueprint $table) {
-            $table->increments('id_operation');
-            $table->string('materiel_id');
-            $table->string('type_operation');
-            $table->string('designation');
-            $table->string('partenaire');
-            $table->date('date_operation');
-            $table->integer('quantite');
-        });
+        // Check if the table already exists
+        if (!Schema::hasTable('operationss')) {
+            Schema::create('operationss', function (Blueprint $table) {
+                $table->increments('id_operation');
+                $table->unsignedBigInteger('materiel_id');
+                $table->foreign('materiel_id')->references('id')->on('materiaux')->onDelete('cascade');
+                $table->string('type_operation');
+                $table->string('designation');
+                $table->string('partenaire');
+                $table->date('date_operation');
+                $table->integer('quantite');
+            });
+        }
     }
 
     /**

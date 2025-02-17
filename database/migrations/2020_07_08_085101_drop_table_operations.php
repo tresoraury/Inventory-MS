@@ -13,7 +13,10 @@ class DropTableOperations extends Migration
      */
     public function up()
     {
-        Schema::drop('operations');
+        // Check if the table exists before attempting to drop it
+        if (Schema::hasTable('operations')) {
+            Schema::drop('operations');
+        }
     }
 
     /**
@@ -23,6 +26,10 @@ class DropTableOperations extends Migration
      */
     public function down()
     {
-        //
+        // Optionally, you can recreate the operations table here if needed
+        Schema::create('operations', function (Blueprint $table) {
+            $table->increments('id');
+            // Add other columns as necessary
+        });
     }
 }

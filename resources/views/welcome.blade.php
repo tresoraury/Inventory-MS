@@ -1,121 +1,88 @@
 <!doctype html>
 <html lang="{{ app()->getLocale() }}">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Welcome - Stock Management</title>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;600&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    <style>
+        body {
+            background-color: #f0f0f0; /* Light grey background */
+            color: #333; /* Dark text for contrast */
+            font-family: 'Raleway', sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 48px;
+            color: #FF5722; /* Red-orange */
+            margin-bottom: 15px;
+        }
+
+        p {
+            font-size: 20px;
+            color: #555; /* Dark grey */
+            margin-bottom: 40px;
+        }
+
+        .links {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px; /* Space between links */
+        }
+
+        .links > a {
+            color: #2196F3; /* Blue */
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: 700;
+            text-decoration: none;
+            border: 2px solid #2196F3;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .links > a:hover {
+            background-color: #2196F3;
+            color: white;
+        }
+
+        .top-right {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Welcome to Your Inventory Hub</h1>
     
-    <body>
-        <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+    <p>Effortlessly Manage Your Stock</p>
 
-        <title>HOME</title>
-
-        <!-- Fonts -->
-        
-
-        <!-- Styles -->
-        <style>
-            html, body {
-                background-color: black;
-                color: grey;
-                font-family: 'Raleway', sans-serif;
-                font-weight: 100;
-                height: 100vh;
-                margin: 0;
-                
-            }
-
-            
-             .full-height {
-                height: 100vh;
-            }
-
-            .flex-center {
-                color: blue;
-                align-items: center;
-                display: flex;
-                justify-content: center;
-            }
-
-            .position-ref {
-                position: relative;
-            }
-
-            .top-right {
-
-                position: absolute;
-                right: 20px;
-                top: 18px;
-            }
-
-
-            .content {
-                text-align: center;
-            }
-
-            .title {
-                font-size:84px;
-            }
-
-            .links > a {
-                color: blue;
-                padding: 0 600px;
-                font-size: 30px;
-                font-weight: 700;
-                letter-spacing: .1rem;
-                text-decoration: none;
-                text-transform: uppercase;
-            }
-
-            .m-b-md {
-                margin-bottom: 30px;
-            }
-            .card_image{
-                 width: 350px;
-                 height: 350px;
-                 position: absolute;
-                 top: 200px;
-                 right: 540px;
-            }
-
-            h1{
-             text-align: center;
-             color: yellow; 
-             }
-
-             p{
-             text-align: center;
-             color: red;
-             size: 70px;            
-             }
-
-
-            
-            
-        </style>
-
-    </head>
-
- <h1>STOCK MANAGEMENT</h1>
- <p> Veuiller Clicker sur connection pour vous connecter</p>
-
-        
-    <div class="flex-center position-ref ">
-         
-            @if (Route::has('login'))
-                <div class="top-right links">
-                    @if (Auth::check())
-                        <a href="{{ url('/home') }}">Home</a>
-                    @else
-                        <a href="{{ url('/login') }}">Connection</a>
-                        
-                    @endif
-                </div>
-            </nav>
-            </div>
-
+    <div class="links">
+        @if (Route::has('login'))
+            @if (Auth::check())
+                <a href="{{ url('/home') }}">Go to Dashboard</a>
+            @else
+                <a href="{{ url('/login') }}">Login</a>
             @endif
-                
-            
-        </div>
-    </body>
+        @endif
+        <a href="{{ url('/about') }}">About Us</a>
+        <a href="{{ url('/contact') }}">Contact Support</a>
+    </div>
+</body>
 </html>

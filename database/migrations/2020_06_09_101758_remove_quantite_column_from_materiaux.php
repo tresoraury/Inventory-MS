@@ -13,9 +13,12 @@ class RemoveQuantiteColumnFromMateriaux extends Migration
      */
     public function up()
     {
-        Schema::table('materiaux', function (Blueprint $table) {
-            $table->dropColumn('quantite');
-        });
+        // Check if the column exists before attempting to drop it
+        if (Schema::hasColumn('materiaux', 'quantite')) {
+            Schema::table('materiaux', function (Blueprint $table) {
+                $table->dropColumn('quantite');
+            });
+        }
     }
 
     /**
@@ -26,7 +29,7 @@ class RemoveQuantiteColumnFromMateriaux extends Migration
     public function down()
     {
         Schema::table('materiaux', function (Blueprint $table) {
-            $table->integer('quantite');
+            $table->integer('quantite')->nullable(); // Optional: make it nullable if needed
         });
     }
 }

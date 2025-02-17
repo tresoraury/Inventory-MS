@@ -13,12 +13,15 @@ class CreateStocksTable extends Migration
      */
     public function up()
     {
-        Schema::create('stocks', function (Blueprint $table) {
-            $table->increments('id_stock');
-            $table->integer('id_materiaux');
-            $table->integer('quantite');
-            $table->string('quantite_detaille');
-        });
+        // Check if the table already exists
+        if (!Schema::hasTable('stocks')) {
+            Schema::create('stocks', function (Blueprint $table) {
+                $table->increments('id_stock');
+                $table->integer('id_materiaux')->unsigned();
+                $table->integer('quantite');
+                $table->string('quantite_detaille');
+            });
+        }
     }
 
     /**

@@ -13,12 +13,16 @@ class CreateMateriauxTable extends Migration
      */
     public function up()
     {
-        Schema::create('materiaux', function (Blueprint $table){
-            $table->bigIncrements('id');
-            $table->integer('No_code');
-            $table->string('designation');
-            $table->string('unite_emploie');
-        });
+        // Check if the table already exists
+        if (!Schema::hasTable('materiaux')) {
+            Schema::create('materiaux', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->integer('No_code');
+                $table->string('designation');
+                $table->string('unite_emploie');
+                // Add other fields if necessary
+            });
+        }
     }
 
     /**
@@ -28,6 +32,6 @@ class CreateMateriauxTable extends Migration
      */
     public function down()
     {
-       //
+        Schema::dropIfExists('materiaux');
     }
 }

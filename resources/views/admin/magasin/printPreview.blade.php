@@ -1,50 +1,79 @@
-<center>
-<br><br>
-<style>
-	.card_image{
-                 width: 100px;
-                 height: 100px;
-                 top: 150px;
-                 right: 300px;
-             }
-    td {
-    
-    border: 1px solid #ddd;
-  padding: 15px;
-  width: 20px;
-  height: 50px;
-  }
-  th {
-    background-color: #4CAF50;
-    color: white;
-    font-size: 1em;
-      }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Print Preview</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        @media print {
+            body * {
+                visibility: hidden; /* Hide everything */
+            }
+            .print-preview, .print-preview * {
+                visibility: visible; /* Show only the print preview content */
+            }
+            .print-preview {
+                position: absolute; /* Positioning for print */
+                left: 0;
+                top: 0;
+            }
+        }
+    </style>
+</head>
+<body>
 
-</style>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
-<script src="http://www.position-absolute.com/creation/print/jquery.printPage.js"></script>
-<a href="{{ url('/prnpriview') }}" class="btnprn btn">Print Preview</a></center>
-{{ csrf_field() }}
-<script type="text/javascript">
-$(document).ready(function(){
-$('.btnprn').printPage();
-});
-</script>
-<div class="card">
-        <img class="card_image" src="photo.jpg" width="200px">
-    </div>
-<center>
-<h1> OPERATION EFFECTUEES </h1>
-<table class="table">
-<tr><th>id_operation</th><th>materiel_id</th><th>type_operation</th><th>designation</th><th>partenaire</th><th>date_operation</th><th>quantite</th></tr>
- @foreach($magasin as $item)
-<tr><td>{{ $item->id_operation }}</td>
-<td>{{ $item->materiel_id }}</td>
-<td>{{ $item->type_operation }}</td>
-<td>{{ $item->designation }}</td>
-<td>{{ $item->partenaire }}</td>
-<td>{{ $item->date_operation }}</td>
-<td>{{ $item->quantite }}</td>
-</tr>
-@endforeach
-</center>
+<div class="print-preview">
+    <h1>OPERATION EFFECTUEES</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID Operation</th>
+                <th>Materiel ID</th>
+                <th>Type Operation</th>
+                <th>Désignation</th>
+                <th>Partenaire</th>
+                <th>Date Operation</th>
+                <th>Quantité</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($magasin as $item)
+                <tr>
+                    <td>{{ $item->id_operation }}</td>
+                    <td>{{ $item->materiel_id }}</td>
+                    <td>{{ $item->type_operation }}</td>
+                    <td>{{ $item->designation }}</td>
+                    <td>{{ $item->partenaire }}</td>
+                    <td>{{ $item->date_operation }}</td>
+                    <td>{{ $item->quantite }}</td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
+</div>
+
+<button onclick="window.print()" style="margin-top: 20px; display: block; margin-left: auto; margin-right: auto;">Print</button>
+
+</body>
+</html>

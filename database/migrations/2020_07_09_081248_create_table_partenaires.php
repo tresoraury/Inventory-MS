@@ -13,13 +13,16 @@ class CreateTablePartenaires extends Migration
      */
     public function up()
     {
-        Schema::create('partenaires', function (Blueprint $table) {
-            $table->increments('id_partenaire');
-            $table->string('type_partenaire');
-            $table->string('nom_partenaire');
-            $table->string('departement');
-            $table->string('operation');
-        });
+        // Check if the table already exists
+        if (!Schema::hasTable('partenaires')) {
+            Schema::create('partenaires', function (Blueprint $table) {
+                $table->increments('id_partenaire');
+                $table->string('type_partenaire');
+                $table->string('nom_partenaire');
+                $table->string('departement');
+                $table->string('operation');
+            });
+        }
     }
 
     /**

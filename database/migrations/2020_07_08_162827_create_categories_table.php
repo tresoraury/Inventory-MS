@@ -13,14 +13,17 @@ class CreateCategoriesTable extends Migration
      */
     public function up()
     {
-        Schema::create('categories', function (Blueprint $table) {
-            $table->increments('id_categorie');
-            $table->string('nom_categorie');
-            $table->string('departement');
-            $table->integer('rangement');
-            $table->string('type_produit');
-            $table->integer('quantite');
-        });
+        // Check if the table already exists
+        if (!Schema::hasTable('categories')) {
+            Schema::create('categories', function (Blueprint $table) {
+                $table->increments('id_categorie');
+                $table->string('nom_categorie');
+                $table->string('departement');
+                $table->integer('rangement');
+                $table->string('type_produit');
+                $table->integer('quantite');
+            });
+        }
     }
 
     /**

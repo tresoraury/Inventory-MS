@@ -13,9 +13,12 @@ class RemoveDateEnregistrementColumnFromMateriaux extends Migration
      */
     public function up()
     {
-        Schema::table('materiaux', function (Blueprint $table) {
-            $table->dropColumn('date_enregistrement');
-        });
+        // Check if the column exists before attempting to drop it
+        if (Schema::hasColumn('materiaux', 'date_enregistrement')) {
+            Schema::table('materiaux', function (Blueprint $table) {
+                $table->dropColumn('date_enregistrement');
+            });
+        }
     }
 
     /**
@@ -26,7 +29,7 @@ class RemoveDateEnregistrementColumnFromMateriaux extends Migration
     public function down()
     {
         Schema::table('materiaux', function (Blueprint $table) {
-            $table->date('date_enregistrement');
+            $table->date('date_enregistrement')->nullable(); // Adjust as necessary
         });
     }
 }

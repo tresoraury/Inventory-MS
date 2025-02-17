@@ -24,7 +24,6 @@ return [
     | Of course, examples of configuring each database platform that is
     | supported by Laravel is shown below to make development simple.
     |
-    |
     | All database work in Laravel is done through the PHP PDO facilities
     | so make sure you have the driver for your particular database of
     | choice installed on your machine before you begin development.
@@ -43,26 +42,10 @@ return [
             'driver' => 'mysql',
             'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '3306'),
-            'database' => env('DB_DATABASE', 'dbstock'),
-            'username' => env('DB_USERNAME', 'root'),
+            'database' => env('DB_DATABASE', 'forge'),
+            'username' => env('DB_USERNAME', 'forge'),
             'password' => env('DB_PASSWORD', ''),
-            'unix_socket' => env('DB_SOCKET', ''),
-            'charset' => 'utf8mb4',
-            'collation' => 'utf8mb4_unicode_ci',
-            'prefix' => '',
-            'strict' => true,
-            'engine' => null,
-
         ],
-
-            'dump' => [
-           'dump_binary_path' => '/path/to/the/binary', // only the path, so without `mysqldump` or `pg_dump`
-           'use_single_transaction',
-           'timeout' => 60 * 5, // 5 minute timeout
-           'exclude_tables' => ['table1', 'table2'],
-           'add_extra_option' => '--optionname=optionvalue', 
-        ],
-        
 
         'pgsql' => [
             'driver' => 'pgsql',
@@ -86,9 +69,9 @@ return [
             'password' => env('DB_PASSWORD', ''),
             'charset' => 'utf8',
             'prefix' => '',
-        ],
+        ], // Corrected this line by adding a closing bracket here
 
-    ],
+    ], // Closed the connections array properly
 
     /*
     |--------------------------------------------------------------------------
