@@ -20,6 +20,11 @@ class CreateMateriauxTable extends Migration
                 $table->integer('No_code');
                 $table->string('designation');
                 $table->string('unite_emploie');
+                $table->string('rangement');
+                $table->integer('quantite');
+                $table->unsignedBigInteger('category_id');
+
+                $table->foreign('category_id')->references('id_categorie')->on('categories')->onDelete('cascade');
                 // Add other fields if necessary
             });
         }

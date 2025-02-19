@@ -87,6 +87,10 @@
                             <label for="quantite">Quantite:</label>
                             <input type="text" name="quantite" class="form-control" value="{{ $materiaux->quantite }}" required>
                         </div>
+                        <div class="form-group">
+                            <label for="price">Prix:</label>
+                            <input type="number" name="price" class="form-control" value="{{ $materiaux->price }}" required>
+                        </div>
                     </div>
 
                     <div class="modal-footer">

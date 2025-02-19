@@ -3883,7 +3883,7 @@ Created using IcoMoon - icomoon.io
 .off-canvas-sidebar .nav li>a {
   margin: 10px 15px 0;
   border-radius: 30px;
-  color: #FFFFFF;
+  
   display: block;
   text-decoration: none;
   position: relative;
@@ -3910,12 +3910,12 @@ Created using IcoMoon - icomoon.io
 .sidebar .nav li:focus:not(.active)>a i,
 .off-canvas-sidebar .nav li:hover:not(.active)>a i,
 .off-canvas-sidebar .nav li:focus:not(.active)>a i {
-  color: #FFFFFF;
+  
 }
 
 .sidebar .nav li.active>a,
 .off-canvas-sidebar .nav li.active>a {
-  background-color: #FFFFFF;
+  
   box-shadow: 0 1px 15px 1px rgba(39, 39, 39, 0.1);
 }
 
@@ -3962,7 +3962,7 @@ Created using IcoMoon - icomoon.io
   height: 100%;
   content: "";
   display: block;
-  background: #FFFFFF;
+  
   opacity: 1;
 }
 
@@ -4010,7 +4010,7 @@ Created using IcoMoon - icomoon.io
   float: left;
   font-size: 20px;
   margin: 10px 10px;
-  color: #FFFFFF;
+  
   line-height: 20px;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
@@ -4022,7 +4022,7 @@ Created using IcoMoon - icomoon.io
   display: block;
   white-space: nowrap;
   font-size: 1em;
-  color: #FFFFFF;
+  
   text-decoration: none;
   font-weight: 400;
   line-height: 30px;
@@ -4155,7 +4155,7 @@ Created using IcoMoon - icomoon.io
 
 .off-canvas-sidebar .nav>li>a,
 .off-canvas-sidebar .nav>li>a:hover {
-  color: #FFFFFF;
+  
 }
 
 .off-canvas-sidebar .nav>li>a:focus {

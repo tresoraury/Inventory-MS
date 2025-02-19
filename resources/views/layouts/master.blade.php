@@ -27,7 +27,7 @@
 <style>
   <style>
   .dropdown-menu {
-    background-color: #ffffff; /* Light background for better contrast */
+    /*background-color: #ffffff;  Light background for better contrast */
     border: 1px solid #ccc; /* Subtle border */
     border-radius: 4px; /* Rounded corners */
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
@@ -39,17 +39,17 @@
   }
 
   .dropdown-item:hover {
-    background-color: #f1f1f1; /* Light grey on hover */
+    /*background-color: #f1f1f1; /* Light grey on hover */
     color: #000; /* Dark text on hover */
   }
 
   .dropdown-item:focus {
     outline: none; /* Remove outline on focus */
-    background-color: #e9ecef; /* Slightly darker grey for focus */
+    /*background-color: #e9ecef; /* Slightly darker grey for focus */
   }
   .sidebar .active {
     background-color: #f39c12; 
-    color: #fff; 
+    /*color: #fff; 
 }
 .sidebar-header {
     padding: 20px 0;
@@ -72,12 +72,12 @@
   <div class="wrapper ">
   <div class="sidebar" data-color="black">
     <!-- Custom Title or Logo Section -->
-    <div class="sidebar-header" style="text-align: center; padding: 20px;">
+    <!--<div class="sidebar-header" style="text-align: center; padding: 20px;">
         <h2 style="color: white; margin: 0;">Inventory Management</h2>
         <!-- Uncomment the following line to use a logo instead -->
-        <!-- <img class="card_image" src="path/to/your/logo.png" alt="Logo" style="width: 100%; height: auto;"> -->
+        <!-- <img class="card_image" src="path/to/your/logo.png" alt="Logo" style="width: 100%; height: auto;"> 
         <p style="color: white; font-style: italic;">Manage your inventory effortlessly.</p>
-    </div>
+    </div> -->
 
     <div class="sidebar-wrapper" id="sidebar-wrapper">
         <ul class="nav">
@@ -86,6 +86,12 @@
                     <i class="fas fa-home fa-5x"></i>
                     <p>HOME</p>
                 </a>
+            </li>
+            <li>
+              <a href="{{ route('pos.index') }}">
+                <i class="fas fa-cash-register"></i> 
+                <p>POS</p>
+              </a>
             </li>
             <li class="{{ 'categorie' == request()->path() ? 'active' : '' }}">
                 <a href="{{ url('categorie') }}">
@@ -96,7 +102,7 @@
             <li class="{{ 'magasin' == request()->path() ? 'active' : '' }}">
                 <a href="{{ url('magasin') }}">
                     <i class="fa fa-shopping-cart"></i>
-                    <p>SALES</p>
+                    <p>Operations</p>
                 </a>
             </li>
             <li class="{{ 'materiaux' == request()->path() ? 'active' : '' }}">
@@ -121,6 +127,18 @@
               <a href="/input-operations">
                 <i class="fas fa-list"></i> 
                 <p>INPUT OPERATIONS</p>
+              </a>
+            </li>
+            <li>
+              <a href="{{ route('low_stock') }}">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>Low Stock Alerts</p>
+              </a>
+            </li>
+            <li>
+              <a href="{{ route('reports.index') }}">
+                <i class="fas fa-chart-line"></i>
+                <p>Reports</p>
               </a>
             </li>
         </ul>

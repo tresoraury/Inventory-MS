@@ -2,18 +2,24 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Models\Categories;
 use App\Models\Materiaux;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Notifications\LowStockAlert;
+use Illuminate\Support\Facades\Notification;
+use App\User; 
 use Session;
 
 class MateriauxreController extends Controller
 {
     public function index()
     {
-        $materiaux = Materiaux::all();
+        $materiaux = Materiaux::with('category')->get();
+        $categories = Categories::all();
         return view('admin.materiaux')
-            ->with('materiaux',$materiaux);
+            ->with('materiaux',$materiaux)
+            ->with('categories', $categories);
     }
 
     public function store(Request $request)
@@ -24,6 +30,8 @@ class MateriauxreController extends Controller
         $materiaux->unite_emploie = $request->input('unite_emploie');
         $materiaux->rangement = $request->input('rangement');
         $materiaux->quantite = $request->input('quantite');
+        $materiaux->price = $request->input('price');
+        $materiaux->category_id = $request->input('category_id');
 
         $materiaux->save();
         Session::flash('statuscode','success');
@@ -45,6 +53,7 @@ class MateriauxreController extends Controller
     	$materiaux->unite_emploie = $request->input('unite_emploie');
         $materiaux->rangement = $request->input('rangement');
         $materiaux->quantite = $request->input('quantite');
+        $materiaux->price = $request->input('price');
     	$materiaux->update();
 
     	Session::flash('statuscode','info');
@@ -58,6 +67,20 @@ class MateriauxreController extends Controller
 
         Session::flash('statuscode','error');
     	return redirect('materiaux')->with('status','Materiel a ete supprime');
+    }
+
+    public function checkLowStock()
+    {
+        $lowStockThreshold = 10;
+        $lowStockItems = Materiaux::where('stock_level', '<', $lowStockThreshold)->get();
+
+    
+        $users = User::where('notify_low_stock', true)->get();
+
+        
+        Notification::send($users, new LowStockAlert($lowStockItems)); 
+
+        return view('admin.low_stock', compact('lowStockItems'));
     }
 
     public function indexx()

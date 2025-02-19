@@ -1,12 +1,11 @@
 @extends('layouts.master')
 
-@section('title', 'Input Operations')
 
 @section('content')
-<div class="card">
-    <div class="card-header">
-        <h4 class="card-title">Liste des Entrées</h4>
-    </div>
+<div class="container mt-5">
+    
+        <h1 class="mb-4">Liste des entree</h1>
+    
     <div class="card-body">
         <table class="table">
             <thead>

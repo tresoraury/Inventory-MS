@@ -76,6 +76,14 @@
             <input type="text" name="designation" class="form-control" id="designation" required>
           </div>
           <div class="form-group">
+            <label for="category_id" class="col-form-label">Catégorie:</label>
+            <select name="category_id" class="form-control" id="category_id" required>
+              @foreach($categories as $category)
+                <option value="{{ $category->id_categorie }}">{{ $category->nom_categorie }}</option>
+              @endforeach
+            </select>
+          </div>
+          <div class="form-group">
             <label for="unite_emploie" class="col-form-label">Unite Emploi:</label>
             <input type="text" name="unite_emploie" class="form-control" id="unite_emploie" required>
           </div>
@@ -86,6 +94,10 @@
           <div class="form-group">
             <label for="quantite" class="col-form-label">Quantite:</label>
             <input type="number" name="quantite" class="form-control" id="quantite" required>
+          </div>
+          <div class="form-group">
+            <label for="price" class="col-form-label">Prix:</label>
+            <input type="number" name="price" class="form-control" id="price" required>
           </div>
       </div>
       <div class="modal-footer">
@@ -144,6 +156,8 @@
                                 <th>Unité Emploi</th>
                                 <th>Rangement</th>
                                 <th>Quantité</th>
+                                <th>Prix</th>
+                                <th>Catégorie</th>
                                 <th>Éditer</th>
                                 <th>Supprimer</th>
                             </tr>
@@ -157,6 +171,8 @@
                                 <td>{{ $data->unite_emploie }}</td>
                                 <td>{{ $data->rangement }}</td>
                                 <td>{{ $data->quantite }}</td>
+                                <td>{{ $data->price }}</td>
+                                <td>{{ $data->category ? $data->category->nom_categorie : 'N/A' }}</td>
                                 <td>
                                     <a href="{{ url('materiaux-us/'.$data->id) }}" class="btn btn-success">Éditer</a>
                                 </td>

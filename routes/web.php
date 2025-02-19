@@ -2,7 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\InputOperationController;
-
+use App\Http\Controllers\Admin\MateriauxreController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\POS\POSController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -27,6 +29,10 @@ Route::group(['middleware' => ['auth', 'admin']], function () {
     Route::get('/dashboard', function () {
         return view('admin.dashboard');
     });
+
+Route::get('/low-stock', [MateriauxreController::class, 'checkLowStock'])->name('low_stock');
+
+Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
 
 Route::get('/role-register','Admin\DashboardController@registered');
 
@@ -72,6 +78,16 @@ Route::get('/print-preview/magasin', 'Admin\MagasinController@indexx')->name('ma
 Route::get('/print-preview/materiaux', 'Admin\MateriauxreController@indexx')->name('materiaux.preview');
 
 Route::get('/input-operations', [InputOperationController::class, 'index'])->name('input.operations.index');
+
+Route::prefix('pos')->group(function () {
+    Route::get('/', [POSController::class, 'index'])->name('pos.index');
+    Route::get('/create', [POSController::class, 'create'])->name('pos.create');
+    Route::post('/', [POSController::class, 'store'])->name('pos.store');
+    Route::get('/{id}/edit', [POSController::class, 'edit'])->name('pos.edit');
+    Route::put('/{id}', [POSController::class, 'update'])->name('pos.update');
+    Route::delete('/{id}', [POSController::class, 'destroy'])->name('pos.destroy');
+});
+
 
 });
 
