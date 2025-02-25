@@ -86,7 +86,11 @@ Route::prefix('pos')->group(function () {
     Route::get('/{id}/edit', [POSController::class, 'edit'])->name('pos.edit');
     Route::put('/{id}', [POSController::class, 'update'])->name('pos.update');
     Route::delete('/{id}', [POSController::class, 'destroy'])->name('pos.destroy');
+
 });
+
+Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+Route::post('/reports/generate', [ReportController::class, 'generateReport'])->name('reports.generate');
 
 
 });

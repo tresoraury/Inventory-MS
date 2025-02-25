@@ -8,26 +8,26 @@
     @if ($lowStockItems->isEmpty())
         <p>No items are below the low stock .</p>
     @else
-        <table class="table">
-            <thead>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>No_code</th>
+                <th>Désignation</th>
+                <th>Stock Level</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($lowStockItems as $item)
                 <tr>
-                    <th>ID</th>
-                    <th>No_code</th>
-                    <th>Désignation</th>
-                    <th>Stock Level</th>
+                    <td>{{ $item->id }}</td>
+                    <td>{{ $item->No_code }}</td>
+                    <td>{{ $item->designation }}</td>
+                    <td>{{ $item->stock_level }}</td>
                 </tr>
-            </thead>
-            <tbody>
-                @foreach ($lowStockItems as $item)
-                    <tr>
-                        <td>{{ $item->id }}</td>
-                        <td>{{ $item->No_code }}</td>
-                        <td>{{ $item->designation }}</td>
-                        <td>{{ $item->stock_level }}</td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
+            @endforeach
+        </tbody>
+</table>
     @endif
 </div>
 @endsection

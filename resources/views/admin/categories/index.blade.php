@@ -1,7 +1,7 @@
 @extends('layouts.master')
 
 @section('title')
-  Categorie | regideso
+  Category
 @endsection
 
 @section('content')

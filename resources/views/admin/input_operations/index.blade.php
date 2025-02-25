@@ -4,7 +4,7 @@
 @section('content')
 <div class="container mt-5">
     
-        <h1 class="mb-4">Liste des entree</h1>
+        <h1 class="mb-4">List of Entries</h1>
     
     <div class="card-body">
         <table class="table">

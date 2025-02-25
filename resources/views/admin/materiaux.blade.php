@@ -1,14 +1,14 @@
 @extends('layouts.master')
 
 @section('title')
-  Materiaux | regideso
+  Products
 @endsection
 
 @section('content')
 
 <style>
   body {
-      background-color: #f5f5f5; /* Light background */
+      background-color: #f5f5f5;
       font-family: 'Montserrat', sans-serif;
   }
 
@@ -19,19 +19,23 @@
   }
 
   .card-header {
-      background-color: #4CAF50; /* Header color */
+      background-color: #4CAF50;
       color: white;
   }
 
   table {
       width: 100%;
       border-collapse: collapse;
+      table-layout: fixed;
   }
 
   th, td {
       border: 1px solid #ddd;
-      padding: 12px;
+      padding: 30px;
       text-align: left;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
   }
 
   th {
@@ -40,21 +44,29 @@
   }
 
   tr:hover {
-      background-color: #f1f1f1; /* Highlight on hover */
+      background-color: #f1f1f1;
   }
 
   .btn-primary, .btn-info {
       border-radius: 0.25rem;
-      padding: 10px 15px;
+      padding: 8px 12px;
   }
 
   .modal-header {
-      background-color: #4CAF50; /* Modal header color */
+      background-color: #4CAF50;
       color: white;
+  }
+
+  @media (max-width: 768px) {
+      table {
+          font-size: 12px;
+      }
+      th, td {
+          padding: 8px;
+      }
   }
 </style>
 
-<!-- Add Material Modal -->
 <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -109,7 +121,6 @@
   </div>
 </div>
 
-<!-- Delete Modal -->
 <div class="modal fade" id="deletemodalpop" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -135,7 +146,6 @@
   </div>
 </div>
 
-<!-- Main Content -->
 <div class="row">
     <div class="col-md-12">
         <div class="card">

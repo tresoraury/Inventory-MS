@@ -87,7 +87,7 @@
                     <p>HOME</p>
                 </a>
             </li>
-            <li>
+            <li class="{{ request()->routeIs('pos.index') ? 'active' : '' }}">
               <a href="{{ route('pos.index') }}">
                 <i class="fas fa-cash-register"></i> 
                 <p>POS</p>
@@ -129,7 +129,7 @@
                 <p>INPUT OPERATIONS</p>
               </a>
             </li>
-            <li>
+            <li class="{{ request()->routeIs('low_stock') ? 'active' : '' }}">
               <a href="{{ route('low_stock') }}">
                 <i class="fas fa-exclamation-triangle"></i>
                 <p>Low Stock Alerts</p>

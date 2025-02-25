@@ -1,7 +1,7 @@
 @extends('layouts.master')
 
 @section('title')
-  Magasin | regideso
+  Operations 
 @endsection
 
 @section('content')
@@ -26,12 +26,16 @@
   table {
       width: 100%;
       border-collapse: collapse;
+      table-layout: fixed;
   }
 
   th, td {
       border: 1px solid #ddd;
-      padding: 12px;
+      padding: 10px;
       text-align: left;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
   }
 
   th {
@@ -45,16 +49,24 @@
 
   .btn-primary, .btn-info, .btn-danger {
       border-radius: 0.25rem;
-      padding: 10px 15px;
+      padding: 8px 12px;
   }
 
   .modal-header {
       background-color: #4CAF50; 
       color: white;
   }
+
+  @media (max-width: 768px) {
+      table {
+          font-size: 12px;
+      }
+      th, td {
+          padding: 8px;
+      }
+  }
 </style>
 
-<!-- Main Content -->
 <div class="row">
     <div class="col-md-12">
         <div class="card">
@@ -70,7 +82,7 @@
                         <thead class=" text-primary">
                             <tr>
                                 <th><strong>ID Operation</strong></th>
-                                <th>Product </th>
+                                <th>Product</th>
                                 <th>Type Operation</th>
                                 <th>Désignation</th>
                                 <th>Issues By</th>
@@ -106,6 +118,30 @@
     </div>
 </div>
 
+<div class="modal fade" id="deletemodalpop" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Confirmation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this operation?
+            </div>
+            <div class="modal-footer">
+                <form id="delete_modal_form" action="" method="POST">
+                    @csrf
+                    @method('DELETE')
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @section('scripts')
@@ -120,7 +156,6 @@ $(document).ready(function() {
             return $(this).text();
         }).get();
 
-        $('#delete_magasin_id_operation').val(data[0]);
         $('#delete_modal_form').attr('action', '/magasin-delete/' + data[0]);
         $('#deletemodalpop').modal('show');
     });

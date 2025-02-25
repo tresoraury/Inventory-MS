@@ -71,7 +71,7 @@ class MateriauxreController extends Controller
 
     public function checkLowStock()
     {
-        $lowStockThreshold = 10;
+        $lowStockThreshold = 5;
         $lowStockItems = Materiaux::where('stock_level', '<', $lowStockThreshold)->get();
 
     

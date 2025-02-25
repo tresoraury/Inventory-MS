@@ -81,8 +81,9 @@ class MagasinController extends Controller
 
     public function edit($id_operation)
     {
-        $magasin = Produits::findOrfail($id_operation);
-        return view('admin.magasin.edit')->with('magasin',$magasin);
+        $magasin = Produits::findOrFail($id_operation);
+        $materiaux = Materiaux::all(); 
+        return view('admin.magasin.edit')->with('magasin', $magasin)->with('materiaux', $materiaux);
     }
 
     public function update(Request $request, $id_operation)

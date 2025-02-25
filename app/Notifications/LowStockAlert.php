@@ -42,9 +42,13 @@ class LowStockAlert extends Notification
      */
     public function toMail($notifiable)
     {
+        $itemList = $this->items->map(function ($item) {
+            return "{$item->designation} (ID: {$item->id}): Stock Level - {$item->stock_level}";
+        })->implode("\n");
+    
         return (new MailMessage)
             ->subject('Low Stock Alert')
             ->line('The following items are low in stock:')
-            ->line($this->items->toJson()); // Adjust this line to format the message as needed
+            ->line($itemList);
     }
 }
