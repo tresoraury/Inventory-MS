@@ -28,9 +28,14 @@
     border-top-right-radius: 0.5rem;
 }
 
-  .card-title, .card-category {
+  .card-title {
       margin: 0;
-     
+      color: #000; /* Set title color to black */
+  }
+
+  .card-category {
+      color: #333; /* Ensure text is dark */
+      font-size: 14px; /* Adjust size as needed */
   }
 
   .btn {
@@ -62,7 +67,7 @@
                 <h4 class="card-title">Total Stock Value</h4>
             </div>
             <div class="card-body">
-                <h2>$12,345</h2>
+                <h2>5000</h2>
                 <p class="card-category">Current total value of stock</p>
             </div>
         </div>
@@ -74,7 +79,7 @@
                 <h4 class="card-title">Products in Stock</h4>
             </div>
             <div class="card-body">
-                <h2>150</h2>
+                <h2>10</h2>
                 <p class="card-category">Total products available</p>
             </div>
         </div>
@@ -94,7 +99,6 @@
 </div>
 
 <!-- Recent Activity Feed -->
-<!-- Recent Activity Feed -->
 <div class="row">
     <div class="col-lg-12">
         <div class="card">
@@ -103,39 +107,22 @@
             </div>
             <div class="card-body">
                 <ul class="list-group">
-                    <li class="list-group-item">Added new product: Tangit</li>
-                    <li class="list-group-item">Updated stock for Ampoule</li>
-                    
+                    <li class="list-group-item">Added new product: computers</li>
+                    <li class="list-group-item">Updated stock for tanks</li>
                 </ul>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Charts Section 
-<div class="row">
-    <div class="col-lg-12">
-        <div class="card">
-            <div class="card-header">
-                <h4 class="card-title">Stock Trends</h4>
-            </div>
-            <div class="card-body">
-                <div class="chart-area">
-                    <canvas id="stockTrendChart"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-</div> -->
-
 <!-- Quick Actions -->
 <div class="row">
     <div class="col-lg-12 text-center">
         <button class="btn btn-info btn-lg" onclick="window.location.href='http://localhost:8000/materiaux';">
-            <span class="fas fa-plus-circle"></span><br>Add New Material
+            <span class="fas fa-plus-circle"></span><br>Add New Products
         </button>
-        <button class="btn btn-info btn-lg" onclick="window.location.href='http://localhost:8000/stock';">
-            <span class="fas fa-edit"></span><br>Manage Stock
+        <button class="btn btn-info btn-lg" onclick="window.location.href='http://localhost:8000/reports';">
+            <span class="fas fa-edit"></span><br>Generate Reports
         </button>
     </div>
 </div>
