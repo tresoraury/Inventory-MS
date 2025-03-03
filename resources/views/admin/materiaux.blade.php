@@ -8,19 +8,23 @@
 
 <style>
   body {
-      background-color: #f5f5f5;
+      background-color: #f9f9f9;
       font-family: 'Montserrat', sans-serif;
   }
 
   .card {
       border-radius: 0.5rem;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
       margin-bottom: 20px;
+      background-color: #ffffff;
   }
 
   .card-header {
       background-color: #4CAF50;
       color: white;
+      padding: 15px;
+      border-top-left-radius: 0.5rem;
+      border-top-right-radius: 0.5rem;
   }
 
   table {
@@ -30,8 +34,8 @@
   }
 
   th, td {
-      border: 1px solid #ddd;
-      padding: 30px;
+      border: 1px solid #e0e0e0;
+      padding: 12px;
       text-align: left;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -41,28 +45,52 @@
   th {
       background-color: #4CAF50;
       color: white;
+      text-transform: uppercase;
   }
 
   tr:hover {
-      background-color: #f1f1f1;
+      background-color: #f2f2f2;
   }
 
-  .btn-primary, .btn-info {
+  .btn {
       border-radius: 0.25rem;
-      padding: 8px 12px;
+      padding: 10px 15px;
+      transition: background-color 0.3s, transform 0.2s;
   }
 
-  .modal-header {
-      background-color: #4CAF50;
+  .btn-primary {
+      background-color: #007bff;
       color: white;
   }
 
+  .btn-primary:hover {
+      background-color: #0056b3;
+      transform: translateY(-2px);
+  }
+
+  .btn-info {
+      background-color: #17a2b8;
+      color: white;
+  }
+
+  .btn-info:hover {
+      background-color: #138496;
+      transform: translateY(-2px);
+  }
+
+  .btn-danger {
+      background-color: #dc3545;
+      color: white;
+  }
+
+  .btn-danger:hover {
+      background-color: #c82333;
+      transform: translateY(-2px);
+  }
+
   @media (max-width: 768px) {
-      table {
-          font-size: 12px;
-      }
       th, td {
-          padding: 8px;
+          padding: 10px;
       }
   }
 </style>
@@ -70,7 +98,7 @@
 <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
-      <div class="modal-header">
+      <div class="modal-header" style="background-color: #4CAF50; color: white;">
         <h5 class="modal-title" id="exampleModalLabel">Nouveau materiel</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
@@ -124,7 +152,7 @@
 <div class="modal fade" id="deletemodalpop" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
-      <div class="modal-header">
+      <div class="modal-header" style="background-color: #4CAF50; color: white;">
         <h5 class="modal-title">Confirmation</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
@@ -158,7 +186,7 @@
             <div class="card-body">
                 <div class="table-responsive">
                     <table id="datatable" class="table">
-                        <thead class=" text-primary">
+                        <thead>
                             <tr>
                                 <th>ID</th>
                                 <th>No_code</th>

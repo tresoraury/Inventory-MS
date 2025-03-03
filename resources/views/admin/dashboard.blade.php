@@ -7,7 +7,6 @@
 @section('content')
 
 <style>
-  /* General Styles */
   body {
       background-color: #f5f5f5;
       font-family: 'Montserrat', sans-serif;
@@ -16,32 +15,38 @@
 
   .card {
       border-radius: 0.5rem;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
       margin-bottom: 20px;
+      transition: transform 0.3s;
+      background-color: #fff;
+  }
+
+  .card:hover {
+      transform: scale(1.02);
   }
 
   .card-header {
-    background-color: #f96332; /* Card header background */
-    color: #fff; /* White text */
-    padding: 10px; /* Add padding for better spacing */
-    border-top-left-radius: 0.5rem;
-    border-top-right-radius: 0.5rem;
-}
+      background-color: #f96332;
+      color: #fff;
+      padding: 15px;
+      border-top-left-radius: 0.5rem;
+      border-top-right-radius: 0.5rem;
+  }
 
   .card-title {
       margin: 0;
-      color: #000; /* Set title color to black */
+      color: black; /* Set title color to black */
   }
 
   .card-category {
-      color: #333; /* Ensure text is dark */
-      font-size: 14px; /* Adjust size as needed */
+      color: #333;
+      font-size: 14px;
   }
 
   .btn {
       border-radius: 0.25rem;
-      padding: 10px 20px;
-      transition: background-color 0.3s;
+      padding: 12px 20px;
+      transition: background-color 0.3s, transform 0.2s;
   }
 
   .btn-info {
@@ -51,24 +56,34 @@
 
   .btn-info:hover {
       background-color: #1a7cb1;
+      transform: translateY(-2px);
   }
 
-  /* Layout Styles */
   .chart-area {
-      height: 250px; /* Define a specific height for charts */
+      height: 250px;
+  }
+
+  .list-group-item {
+      border: none;
+      padding: 15px;
+      background-color: #f9f9f9;
+      transition: background-color 0.3s;
+  }
+
+  .list-group-item:hover {
+      background-color: #e8e8e8;
   }
 </style>
 
 <div class="row">
-    <!-- Overview Cards -->
     <div class="col-lg-4 col-md-6">
         <div class="card">
             <div class="card-header">
                 <h4 class="card-title">Total Stock Value</h4>
             </div>
             <div class="card-body">
-                <h2>5000</h2>
-                <p class="card-category">Current total value of stock</p>
+                <h2 style="color: black;">5000</h2>
+                <p class="card-category" style="color: black;">Current total value of stock</p>
             </div>
         </div>
     </div>
@@ -79,8 +94,8 @@
                 <h4 class="card-title">Products in Stock</h4>
             </div>
             <div class="card-body">
-                <h2>10</h2>
-                <p class="card-category">Total products available</p>
+                <h2 style="color: black;">10</h2>
+                <p class="card-category" style="color: black;">Total products available</p>
             </div>
         </div>
     </div>
@@ -91,14 +106,13 @@
                 <h4 class="card-title">Low Stock Alerts</h4>
             </div>
             <div class="card-body">
-                <h2>5</h2>
-                <p class="card-category">Products running low on stock</p>
+                <h2 style="color: black;">5</h2>
+                <p class="card-category" style="color: black;">Products running low on stock</p>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Recent Activity Feed -->
 <div class="row">
     <div class="col-lg-12">
         <div class="card">
@@ -115,7 +129,6 @@
     </div>
 </div>
 
-<!-- Quick Actions -->
 <div class="row">
     <div class="col-lg-12 text-center">
         <button class="btn btn-info btn-lg" onclick="window.location.href='http://localhost:8000/materiaux';">
@@ -131,7 +144,6 @@
 
 @section('scripts')
 <script>
-// JavaScript to render the stock trend chart
 var ctx = document.getElementById('stockTrendChart').getContext('2d');
 var stockTrendChart = new Chart(ctx, {
     type: 'line',
