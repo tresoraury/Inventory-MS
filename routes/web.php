@@ -20,6 +20,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::view('/about', 'about');
+Route::view('/contact', 'contact');
+
+
 
 //Auth::routes();
 
