@@ -101,6 +101,12 @@
               <p>PRODUCTS</p>
             </a>
           </li>
+          <li class="{{ request()->routeIs('roles.index') ? 'active' : '' }}">
+            <a href="{{ route('roles.index') }}">
+              <i class="fas fa-user-shield"></i>
+              <p>ROLES</p>
+            </a>
+          </li>
           <li class="{{ 'role-register' == request()->path() ? 'active' : '' }}">
             <a href="/role-register">
               <i class="now-ui-icons users_single-02"></i>

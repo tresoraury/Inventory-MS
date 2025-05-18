@@ -1,6 +1,6 @@
 <?php
 
-namespace Database\Seeders;
+namespace Database\Seeds;
 
 use Illuminate\Database\Seeder;
 use App\Models\OperationType;
@@ -9,11 +9,8 @@ class OperationTypeSeeder extends Seeder
 {
     public function run()
     {
-        OperationType::create(['name' => 'ENTREE']);
-        OperationType::create(['name' => 'SORTIE']);
-        OperationType::create(['name' => 'TRANSFERT']);
-        OperationType::create(['name' => 'VENTE']);
-        OperationType::create(['name' => 'REQUISITION']);
-        OperationType::create(['name' => 'PRET']);
+        OperationType::firstOrCreate(['name' => 'purchase'], ['description' => 'Stock purchase']);
+        OperationType::firstOrCreate(['name' => 'sale'], ['description' => 'Stock sale']);
+        OperationType::firstOrCreate(['name' => 'adjustment'], ['description' => 'Stock adjustment']);
     }
 }

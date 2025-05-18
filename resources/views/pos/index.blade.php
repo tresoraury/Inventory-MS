@@ -1,39 +1,24 @@
-@extends('layouts.master')
+@extends('layouts.app')
 
 @section('content')
-<div class="container mt-5"> 
-    <h1 class="mb-4">Sales</h1> 
-    <a href="{{ route('pos.create') }}" class="btn btn-primary mb-3">Make Sale</a>
-    <table class="table table-striped"> 
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Materiaux Name</th>
-                <th>Quantity</th>
-                <th>Client Name</th>
-                <th>Total</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($sales as $sale)
-                <tr>
-                    <td>{{ $sale->id }}</td>
-                    <td>{{ $sale->materiaux ? $sale->materiaux->designation : 'N/A' }}</td>
-                    <td>{{ $sale->quantity }}</td>
-                    <td>{{ $sale->client_name }}</td>
-                    <td>{{ $sale->total }}</td>
-                    <td>
-                        <a href="{{ route('pos.edit', $sale->id) }}" class="btn btn-warning">Edit</a>
-                        <form action="{{ route('pos.destroy', $sale->id) }}" method="POST" style="display:inline;">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger">Delete</button>
-                        </form>
-                    </td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
-</div>
+    <div class="container">
+        <h1>Point of Sale</h1>
+        <form action="{{ route('pos.store') }}" method="POST">
+            @csrf
+            <div class="form-group">
+                <label>Product</label>
+                <select name="product_id" class="form-control" required>
+                    <option value="">Select Product</option>
+                    @foreach ($products as $product)
+                        <option value="{{ $product->id }}">{{ $product->name }} (Stock: {{ $product->stock_quantity }})</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Quantity</label>
+                <input type="number" name="quantity" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Record Sale</button>
+        </form>
+    </div>
 @endsection

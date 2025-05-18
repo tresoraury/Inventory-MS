@@ -4,12 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class OperationType extends Model
+class Category extends Model
 {
     protected $fillable = ['name', 'description'];
 
-    public function operations()
+    public function products()
     {
-        return $this->hasMany(Operation::class);
+        return $this->hasMany(Product::class);
     }
 }
