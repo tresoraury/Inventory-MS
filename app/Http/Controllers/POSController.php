@@ -3,17 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
-use App\Models\Operation;
-use App\Models\OperationType;
+use App\Models\Sale;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class POSController extends Controller
 {
     public function index()
     {
-        $products = Product::where('stock_quantity', '>', 0)->get();
-        return view('pos.index', compact('products'));
+        $products = Product::all();
+        $sales = Sale::with('product')->latest()->take(10)->get();
+        return view('pos', compact('products', 'sales'));
     }
 
     public function store(Request $request)
@@ -23,24 +22,22 @@ class POSController extends Controller
             'quantity' => 'required|integer|min:1',
         ]);
 
-        $product = Product::find($request->product_id);
+        $product = Product::findOrFail($request->product_id);
+
         if ($product->stock_quantity < $request->quantity) {
-            return back()->with('error', 'Insufficient stock.');
+            return redirect()->route('pos.index')->with('error', 'Insufficient stock for ' . $product->name);
         }
 
-        DB::transaction(function () use ($request) {
-            $product = Product::find($request->product_id);
-            $product->stock_quantity -= $request->quantity;
-            $product->save();
+        Sale::create([
+            'product_id' => $request->product_id,
+            'quantity' => $request->quantity,
+            'price' => $product->price * $request->quantity,
+        ]);
 
-            Operation::create([
-                'product_id' => $request->product_id,
-                'operation_type_id' => OperationType::where('name', 'sale')->first()->id,
-                'quantity' => $request->quantity,
-                'operation_date' => now()->toDateString(),
-            ]);
-        });
+        $product->update([
+            'stock_quantity' => $product->stock_quantity - $request->quantity,
+        ]);
 
-        return redirect()->route('pos.index')->with('success', 'Sale recorded.');
+        return redirect()->route('pos.index')->with('success', 'Sale recorded successfully.');
     }
 }

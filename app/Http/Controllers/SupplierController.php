@@ -22,8 +22,9 @@ class SupplierController extends Controller
     {
         $request->validate([
             'name' => 'required',
-            'email' => 'nullable|email|unique:suppliers,email',
-            'phone' => 'nullable|unique:suppliers,phone',
+            'email' => 'nullable|email',
+            'phone' => 'nullable',
+            'address' => 'nullable',
         ]);
 
         Supplier::create($request->all());
@@ -39,8 +40,9 @@ class SupplierController extends Controller
     {
         $request->validate([
             'name' => 'required',
-            'email' => 'nullable|email|unique:suppliers,email,' . $supplier->id,
-            'phone' => 'nullable|unique:suppliers,phone,' . $supplier->id,
+            'email' => 'nullable|email',
+            'phone' => 'nullable',
+            'address' => 'nullable',
         ]);
 
         $supplier->update($request->all());

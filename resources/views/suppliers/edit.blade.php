@@ -1,31 +1,47 @@
-@extends('layouts.app')
+@extends('layouts.master')
+
+@section('title')
+    Edit Supplier
+@endsection
 
 @section('content')
-<div class="container mx-auto px-4 py-6">
-    <h1 class="text-2xl font-bold mb-4">Edit Supplier</h1>
-    <form action="{{ route('suppliers.update', $supplier) }}" method="POST" class="bg-white p-6 rounded shadow">
-        @csrf
-        @method('PUT')
-        <div class="mb-4">
-            <label for="name" class="block text-sm font-medium">Name</label>
-            <input type="text" name="name" id="name" value="{{ $supplier->name }}" class="w-full border rounded px-3 py-2" required>
-            @error('name')
-            <p class="text-red-500 text-sm">{{ $message }}</p>
-            @enderror
-        </div>
-        <div class="mb-4">
-            <label for="contact" class="block text-sm font-medium">Contact</label>
-            <input type="text" name="contact" id="contact" value="{{ $supplier->contact }}" class="w-full border rounded px-3 py-2">
-        </div>
-        <div class="mb-4">
-            <label for="email" class="block text-sm font-medium">Email</label>
-            <input type="email" name="email" id="email" value="{{ $supplier->email }}" class="w-full border rounded px-3 py-2">
-        </div>
-        <div class="mb-4">
-            <label for="address" class="block text-sm font-medium">Address</label>
-            <textarea name="address" id="address" class="w-full border rounded px-3 py-2">{{ $supplier->address }}</textarea>
-        </div>
-        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Update Supplier</button>
-    </form>
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Edit Supplier</h5>
+        <form action="{{ route('suppliers.update', $supplier->id) }}" method="POST">
+            @csrf
+            @method('PUT')
+            <div class="mb-3">
+                <label for="name" class="form-label">Name</label>
+                <input type="text" name="name" id="name" class="form-control" value="{{ old('name', $supplier->name) }}" required>
+                @error('name')
+                    <div class="text-danger">{{ $message }}</div>
+                @enderror
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" name="email" id="email" class="form-control" value="{{ old('email', $supplier->email) }}">
+                @error('email')
+                    <div class="text-danger">{{ $message }}</div>
+                @enderror
+            </div>
+            <div class="mb-3">
+                <label for="phone" class="form-label">Phone</label>
+                <input type="text" name="phone" id="phone" class="form-control" value="{{ old('phone', $supplier->phone) }}">
+                @error('phone')
+                    <div class="text-danger">{{ $message }}</div>
+                @enderror
+            </div>
+            <div class="mb-3">
+                <label for="address" class="form-label">Address</label>
+                <textarea name="address" id="address" class="form-control">{{ old('address', $supplier->address) }}</textarea>
+                @error('address')
+                    <div class="text-danger">{{ $message }}</div>
+                @enderror
+            </div>
+            <button type="submit" class="btn btn-primary">Update Supplier</button>
+            <a href="{{ route('suppliers.index') }}" class="btn btn-outline-secondary">Cancel</a>
+        </form>
+    </div>
 </div>
 @endsection
