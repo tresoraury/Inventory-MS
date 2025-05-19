@@ -30,11 +30,22 @@ class ProductController extends Controller
             'unit' => 'required',
             'price' => 'required|numeric|min:0',
             'stock_quantity' => 'required|integer|min:0',
+            'minimum_quantity' => 'required|integer|min:0',
             'category_id' => 'nullable|exists:categories,id',
             'supplier_id' => 'nullable|exists:suppliers,id',
         ]);
 
-        Product::create($request->all());
+        Product::create([
+            'code' => $request->code,
+            'name' => $request->name,
+            'unit' => $request->unit,
+            'price' => $request->price,
+            'stock_quantity' => $request->stock_quantity,
+            'minimum_quantity' => $request->minimum_quantity,
+            'category_id' => $request->category_id,
+            'supplier_id' => $request->supplier_id,
+        ]);
+
         return redirect()->route('products.index')->with('success', 'Product created.');
     }
 
@@ -53,11 +64,22 @@ class ProductController extends Controller
             'unit' => 'required',
             'price' => 'required|numeric|min:0',
             'stock_quantity' => 'required|integer|min:0',
+            'minimum_quantity' => 'required|integer|min:0',
             'category_id' => 'nullable|exists:categories,id',
             'supplier_id' => 'nullable|exists:suppliers,id',
         ]);
 
-        $product->update($request->all());
+        $product->update([
+            'code' => $request->code,
+            'name' => $request->name,
+            'unit' => $request->unit,
+            'price' => $request->price,
+            'stock_quantity' => $request->stock_quantity,
+            'minimum_quantity' => $request->minimum_quantity,
+            'category_id' => $request->category_id,
+            'supplier_id' => $request->supplier_id,
+        ]);
+
         return redirect()->route('products.index')->with('success', 'Product updated.');
     }
 
@@ -65,5 +87,11 @@ class ProductController extends Controller
     {
         $product->delete();
         return redirect()->route('products.index')->with('success', 'Product deleted.');
+    }
+
+    public function lowStock()
+    {
+        $products = Product::where('stock_quantity', '<', 'minimum_quantity')->get();
+        return view('products.low_stock', compact('products'));
     }
 }

@@ -7,8 +7,9 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\OperationController;
 use App\Http\Controllers\POSController;
-use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\RoleController;
+use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
     return redirect()->route('dashboard');
@@ -22,10 +23,10 @@ Auth::routes();
 Route::group(['middleware' => ['auth', 'admin']], function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    Route::get('/role-register', [AdminDashboardController::class, 'registered'])->name('role.register');
-    Route::get('/role-edit/{id}', [AdminDashboardController::class, 'registeredit'])->name('role.edit');
-    Route::put('/role-register-update/{id}', [AdminDashboardController::class, 'registerupdate'])->name('role.update');
-    Route::delete('/role-delete/{id}', [AdminDashboardController::class, 'registerdelete'])->name('role.delete');
+    Route::get('/role-register', [UserManagementController::class, 'registered'])->name('role.register');
+    Route::get('/role-edit/{id}', [UserManagementController::class, 'registeredit'])->name('role.edit');
+    Route::put('/role-register-update/{id}', [UserManagementController::class, 'registerupdate'])->name('role.update');
+    Route::delete('/role-delete/{id}', [UserManagementController::class, 'registerdelete'])->name('role.delete');
 
     Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
     Route::post('/roles/update', [RoleController::class, 'update'])->name('roles.update');
@@ -39,6 +40,8 @@ Route::group(['middleware' => ['auth', 'admin']], function () {
         Route::get('/', [POSController::class, 'index'])->name('pos.index');
         Route::post('/', [POSController::class, 'store'])->name('pos.store');
     });
+
+    Route::get('/low-stock', [ProductController::class, 'lowStock'])->name('low_stock');
 });
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

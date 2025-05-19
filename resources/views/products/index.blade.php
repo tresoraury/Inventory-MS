@@ -1,19 +1,24 @@
-@extends('layouts.app')
+@extends('layouts.master')
+
+@section('title')
+    Products
+@endsection
 
 @section('content')
-    <div class="container">
-        <h1>Products</h1>
-        <a href="{{ route('products.create') }}" class="btn btn-primary">Add Product</a>
-        <table class="table mt-3">
+<div class="card">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="card-title">Products</h5>
+            <a href="{{ route('products.create') }}" class="btn btn-primary">Add Product</a>
+        </div>
+        <table class="table table-hover">
             <thead>
                 <tr>
                     <th>Code</th>
                     <th>Name</th>
-                    <th>Unit</th>
-                    <th>Price</th>
                     <th>Stock</th>
+                    <th>Price</th>
                     <th>Category</th>
-                    <th>Supplier</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -22,17 +27,15 @@
                     <tr>
                         <td>{{ $product->code }}</td>
                         <td>{{ $product->name }}</td>
-                        <td>{{ $product->unit }}</td>
-                        <td>{{ $product->price }}</td>
                         <td>{{ $product->stock_quantity }}</td>
-                        <td>{{ $product->category->name ?? 'N/A' }}</td>
-                        <td>{{ $product->supplier->name ?? 'N/A' }}</td>
+                        <td>{{ number_format($product->price, 2) }}</td>
+                        <td>{{ $product->category ? $product->category->name : 'N/A' }}</td>
                         <td>
-                            <a href="{{ route('products.edit', $product) }}" class="btn btn-sm btn-warning">Edit</a>
-                            <form action="{{ route('products.destroy', $product) }}" method="POST" style="display:inline;">
+                            <a href="{{ route('products.edit', $product->id) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                            <form action="{{ route('products.destroy', $product->id) }}" method="POST" class="d-inline">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure?')">Delete</button>
                             </form>
                         </td>
                     </tr>
@@ -40,4 +43,5 @@
             </tbody>
         </table>
     </div>
+</div>
 @endsection
