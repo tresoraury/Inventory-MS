@@ -63,6 +63,7 @@ class UserManagementController extends Controller
             'email' => 'required|email|unique:users,email,' . $id,
             'password' => 'nullable|string|min:8|confirmed',
             'role_id' => 'required|exists:roles,id',
+            'notify_low_stock' => 'nullable|boolean',
         ]);
 
         $user = User::findOrFail($id);
@@ -71,7 +72,7 @@ class UserManagementController extends Controller
             'email' => $request->email,
             'notify_low_stock' => $request->notify_low_stock ?? 0,
         ];
-        if ($request->password) {
+        if ($request->filled('password')) {
             $data['password'] = Hash::make($request->password);
         }
         $user->update($data);
