@@ -35,8 +35,8 @@ Route::group(['middleware' => ['auth', 'admin']], function () {
     Route::resource('products', ProductController::class)->middleware('permission:manage products');
     Route::resource('categories', CategoryController::class)->middleware('permission:manage products');
     Route::resource('suppliers', SupplierController::class)->middleware('permission:manage products');
-    Route::resource('operations', OperationController::class)->middleware('permission:manage stock');
     Route::resource('operation_types', OperationTypeController::class)->middleware('permission:manage operation types');
+    Route::resource('operations', OperationController::class)->middleware('permission:manage stock');
 
     Route::prefix('pos')->group(function () {
         Route::get('/', [POSController::class, 'index'])->name('pos.index');

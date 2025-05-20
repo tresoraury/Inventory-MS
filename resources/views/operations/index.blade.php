@@ -11,6 +11,12 @@
             <h5 class="card-title">Operations</h5>
             <a href="{{ route('operations.create') }}" class="btn btn-primary">Add Operation</a>
         </div>
+        @if (session('success'))
+            <div class="alert alert-success">{{ session('success') }}</div>
+        @endif
+        @if (session('error'))
+            <div class="alert alert-danger">{{ session('error') }}</div>
+        @endif
         <table class="table table-hover">
             <thead>
                 <tr>

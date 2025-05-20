@@ -34,15 +34,7 @@ class OperationController extends Controller
             'operation_date' => 'required|date',
         ]);
 
-        Operation::create([
-            'product_id' => $request->product_id,
-            'operation_type_id' => $request->operation_type_id,
-            'supplier_id' => $request->supplier_id,
-            'quantity' => $request->quantity,
-            'operation_date' => $request->operation_date,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        Operation::create($request->all());
 
         return redirect()->route('operations.index')->with('success', 'Operation created successfully.');
     }
@@ -67,14 +59,7 @@ class OperationController extends Controller
         ]);
 
         $operation = Operation::findOrFail($id);
-        $operation->update([
-            'product_id' => $request->product_id,
-            'operation_type_id' => $request->operation_type_id,
-            'supplier_id' => $request->supplier_id,
-            'quantity' => $request->quantity,
-            'operation_date' => $request->operation_date,
-            'updated_at' => now(),
-        ]);
+        $operation->update($request->all());
 
         return redirect()->route('operations.index')->with('success', 'Operation updated successfully.');
     }
