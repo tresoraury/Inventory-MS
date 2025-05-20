@@ -16,28 +16,36 @@ class POSController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'product_id' => 'required|exists:products,id',
-            'quantity' => 'required|integer|min:1',
-        ]);
+{
+    $request->validate([
+        'product_id' => 'required|exists:products,id',
+        'quantity' => 'required|integer|min:1',
+    ]);
 
-        $product = Product::findOrFail($request->product_id);
+    $product = Product::findOrFail($request->product_id);
 
-        if ($product->stock_quantity < $request->quantity) {
-            return redirect()->route('pos.index')->with('error', 'Insufficient stock for ' . $product->name);
-        }
-
-        Sale::create([
-            'product_id' => $request->product_id,
-            'quantity' => $request->quantity,
-            'price' => $product->price * $request->quantity,
-        ]);
-
-        $product->update([
-            'stock_quantity' => $product->stock_quantity - $request->quantity,
-        ]);
-
-        return redirect()->route('pos.index')->with('success', 'Sale recorded successfully.');
+    if ($product->stock_quantity < $request->quantity) {
+        return redirect()->route('pos.index')->with('error', 'Insufficient stock for ' . $product->name);
     }
+
+    $totalPrice = $product->price * $request->quantity;
+
+    if ($totalPrice > 99999999.99) {
+        return redirect()->route('pos.index')->with('error', 'Total price exceeds maximum allowed value.');
+    }
+
+    Sale::create([
+        'product_id' => $request->product_id,
+        'quantity' => $request->quantity,
+        'price' => $totalPrice,
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+
+    // Update product stock
+    $product->stock_quantity -= $request->quantity;
+    $product->save();
+
+    return redirect()->route('pos.index')->with('success', 'Sale recorded successfully.');
+}
 }

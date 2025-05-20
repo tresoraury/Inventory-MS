@@ -61,6 +61,9 @@
                         <a class="nav-link {{ Route::is('operations.*') ? 'active' : '' }}" href="{{ route('operations.index') }}">Operations</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link {{ Route::is('operation_types.*') ? 'active' : '' }}" href="{{ route('operation_types.index') }}">Operations Types</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link {{ Route::is('pos.*') ? 'active' : '' }}" href="{{ route('pos.index') }}">POS</a>
                     </li>
                     <li class="nav-item">

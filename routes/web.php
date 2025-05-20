@@ -6,6 +6,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\OperationController;
+use App\Http\Controllers\OperationTypeController;
 use App\Http\Controllers\POSController;
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\Admin\RoleController;
@@ -35,6 +36,7 @@ Route::group(['middleware' => ['auth', 'admin']], function () {
     Route::resource('categories', CategoryController::class)->middleware('permission:manage products');
     Route::resource('suppliers', SupplierController::class)->middleware('permission:manage products');
     Route::resource('operations', OperationController::class)->middleware('permission:manage stock');
+    Route::resource('operation_types', OperationTypeController::class)->middleware('permission:manage operation types');
 
     Route::prefix('pos')->group(function () {
         Route::get('/', [POSController::class, 'index'])->name('pos.index');

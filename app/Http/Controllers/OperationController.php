@@ -29,40 +29,61 @@ class OperationController extends Controller
         $request->validate([
             'product_id' => 'required|exists:products,id',
             'operation_type_id' => 'required|exists:operation_types,id',
+            'supplier_id' => 'nullable|exists:suppliers,id',
             'quantity' => 'required|integer|min:1',
             'operation_date' => 'required|date',
-            'supplier_id' => 'nullable|exists:suppliers,id',
         ]);
 
-        Operation::create($request->all());
-        return redirect()->route('operations.index')->with('success', 'Operation created.');
+        Operation::create([
+            'product_id' => $request->product_id,
+            'operation_type_id' => $request->operation_type_id,
+            'supplier_id' => $request->supplier_id,
+            'quantity' => $request->quantity,
+            'operation_date' => $request->operation_date,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return redirect()->route('operations.index')->with('success', 'Operation created successfully.');
     }
 
-    public function edit(Operation $operation)
+    public function edit($id)
     {
+        $operation = Operation::findOrFail($id);
         $products = Product::all();
         $operationTypes = OperationType::all();
         $suppliers = Supplier::all();
         return view('operations.edit', compact('operation', 'products', 'operationTypes', 'suppliers'));
     }
 
-    public function update(Request $request, Operation $operation)
+    public function update(Request $request, $id)
     {
         $request->validate([
             'product_id' => 'required|exists:products,id',
             'operation_type_id' => 'required|exists:operation_types,id',
+            'supplier_id' => 'nullable|exists:suppliers,id',
             'quantity' => 'required|integer|min:1',
             'operation_date' => 'required|date',
-            'supplier_id' => 'nullable|exists:suppliers,id',
         ]);
 
-        $operation->update($request->all());
-        return redirect()->route('operations.index')->with('success', 'Operation updated.');
+        $operation = Operation::findOrFail($id);
+        $operation->update([
+            'product_id' => $request->product_id,
+            'operation_type_id' => $request->operation_type_id,
+            'supplier_id' => $request->supplier_id,
+            'quantity' => $request->quantity,
+            'operation_date' => $request->operation_date,
+            'updated_at' => now(),
+        ]);
+
+        return redirect()->route('operations.index')->with('success', 'Operation updated successfully.');
     }
 
-    public function destroy(Operation $operation)
+    public function destroy($id)
     {
+        $operation = Operation::findOrFail($id);
         $operation->delete();
-        return redirect()->route('operations.index')->with('success', 'Operation deleted.');
+
+        return redirect()->route('operations.index')->with('success', 'Operation deleted successfully.');
     }
 }

@@ -11,7 +11,7 @@ class RoleController extends Controller
 {
     public function index()
     {
-        $roles = Role::all();
+        $roles = Role::with('permissions')->get();
         return view('admin.roles', compact('roles'));
     }
 
@@ -19,7 +19,10 @@ class RoleController extends Controller
     {
         $request->validate([
             'permissions' => 'array',
-            'permissions.*' => 'array', 
+            'permissions.*' => 'array',
+            'permissions.*' => 'array',
+            'permissions.*' => 'array',
+            
         ]);
 
         foreach ($request->permissions as $roleId => $permissions) {
