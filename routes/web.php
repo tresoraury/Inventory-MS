@@ -19,12 +19,14 @@ Route::get('/', function () {
 Route::view('/about', 'about');
 Route::view('/contact', 'contact');
 
-Auth::routes();
+Auth::routes(['register' => false]); // Disable registration
 
 Route::group(['middleware' => ['auth', 'admin']], function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('permission:view dashboard');
 
     Route::get('/role-register', [UserManagementController::class, 'registered'])->name('role.register');
+    Route::get('/role-create', [UserManagementController::class, 'create'])->name('role.create');
+    Route::post('/role-store', [UserManagementController::class, 'store'])->name('role.store');
     Route::get('/role-edit/{id}', [UserManagementController::class, 'registeredit'])->name('role.edit');
     Route::put('/role-register-update/{id}', [UserManagementController::class, 'registerupdate'])->name('role.update');
     Route::delete('/role-delete/{id}', [UserManagementController::class, 'registerdelete'])->name('role.delete');

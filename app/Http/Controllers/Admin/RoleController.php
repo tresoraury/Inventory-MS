@@ -20,12 +20,14 @@ class RoleController extends Controller
     {
         $request->validate([
             'permissions' => 'array',
-            'permissions.*' => 'exists:permissions,id',
+            'permissions.*' => 'array',
+            'permissions.*.*' => 'exists:permissions,id',
         ]);
 
         foreach ($request->input('permissions', []) as $roleId => $permissionIds) {
             $role = Role::findOrFail($roleId);
-            $role->syncPermissions($permissionIds);
+            $permissions = Permission::whereIn('id', $permissionIds)->get();
+            $role->syncPermissions($permissions);
         }
 
         return redirect()->route('roles.index')->with('success', 'Permissions updated successfully.');

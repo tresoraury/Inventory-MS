@@ -34,7 +34,7 @@
                                     <input type="checkbox"
                                            name="permissions[{{ $role->id }}][]"
                                            value="{{ $permission->id }}"
-                                           {{ $role->hasPermissionTo($permission->id) ? 'checked' : '' }}>
+                                           {{ in_array($permission->id, $role->permissions->pluck('id')->toArray()) ? 'checked' : '' }}>
                                 </td>
                             @endforeach
                         </tr>
