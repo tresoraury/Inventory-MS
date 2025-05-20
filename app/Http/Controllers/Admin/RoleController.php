@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Role;
-use App\Models\Permission;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 use Illuminate\Http\Request;
 
 class RoleController extends Controller
@@ -12,38 +12,22 @@ class RoleController extends Controller
     public function index()
     {
         $roles = Role::with('permissions')->get();
-        return view('admin.roles', compact('roles'));
+        $permissions = Permission::all();
+        return view('admin.roles', compact('roles', 'permissions'));
     }
 
     public function update(Request $request)
     {
         $request->validate([
             'permissions' => 'array',
-            'permissions.*' => 'array',
-            'permissions.*' => 'array',
-            'permissions.*' => 'array',
-            
+            'permissions.*' => 'exists:permissions,id',
         ]);
 
-        foreach ($request->permissions as $roleId => $permissions) {
-            $role = Role::find($roleId);
-            
-            if ($role) {
-                foreach ($permissions as $permission => $value) {
-                    
-                    $permissionId = Permission::where('name', $permission)->value('id');
-
-                    if ($value && $permissionId) {
-                        
-                        $role->permissions()->attach($permissionId);
-                    } elseif (!$value && $permissionId) {
-                        
-                        $role->permissions()->detach($permissionId);
-                    }
-                }
-            }
+        foreach ($request->input('permissions', []) as $roleId => $permissionIds) {
+            $role = Role::findOrFail($roleId);
+            $role->syncPermissions($permissionIds);
         }
 
-        return redirect()->back()->with('status', 'Permissions updated successfully!');
+        return redirect()->route('roles.index')->with('success', 'Permissions updated successfully.');
     }
 }

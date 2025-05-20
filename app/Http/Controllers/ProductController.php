@@ -91,7 +91,7 @@ class ProductController extends Controller
 
     public function lowStock()
     {
-        $products = Product::where('stock_quantity', '<', 'minimum_quantity')->get();
+        $products = Product::whereColumn('stock_quantity', '<', 'minimum_quantity')->get();
         return view('products.low_stock', compact('products'));
     }
 }
