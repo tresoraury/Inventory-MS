@@ -8,7 +8,7 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\OperationController;
 use App\Http\Controllers\POSController;
 use App\Http\Controllers\Admin\UserManagementController;
-use App\Http\Controllers\RoleController;
+use App\Http\Controllers\Admin\RoleController;
 use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {

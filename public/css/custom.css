@@ -1,97 +1,40 @@
-/* Custom CSS for Inventory Management System */
+/* Custom Styles */
 body {
-    font-family: 'Inter', sans-serif;
     background-color: #f8f9fa;
-    color: #333;
-}
-
-.navbar {
-    background-color: #ffffff;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.navbar-brand {
-    font-weight: 700;
-    color: #2563eb !important;
-}
-
-.nav-link {
-    color: #4b5563 !important;
-    transition: color 0.2s;
-}
-
-.nav-link:hover, .nav-link.active {
-    color: #2563eb !important;
-    font-weight: 600;
+    font-family: 'Arial', sans-serif;
 }
 
 .card {
     border: none;
-    border-radius: 0.75rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
 }
 
 .card:hover {
-    transform: translateY(-5px);
-}
-
-.card-title {
-    color: #2563eb;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .btn-primary {
-    background-color: #2563eb;
-    border-color: #2563eb;
-    transition: background-color 0.2s;
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+    transition: background-color 0.3s ease;
 }
 
 .btn-primary:hover {
-    background-color: #1d4ed8;
-    border-color: #1d4ed8;
-}
-
-.btn-outline-primary {
-    border-color: #2563eb;
-    color: #2563eb;
-}
-
-.btn-outline-primary:hover {
-    background-color: #2563eb;
-    color: #ffffff;
-}
-
-.btn-outline-danger {
-    border-color: #dc3545;
-    color: #dc3545;
-}
-
-.btn-outline-danger:hover {
-    background-color: #dc3545;
-    color: #ffffff;
-}
-
-.table {
-    background-color: #ffffff;
-    border-radius: 0.5rem;
-    overflow: hidden;
+    background-color: #138496;
+    border-color: #138496;
 }
 
 .table-hover tbody tr:hover {
-    background-color: #f1f5f9;
+    background-color: #f1f1f1;
 }
 
+.alert {
+    border-radius: 5px;
+}
+
+/* Ensure container padding */
 .container {
-    max-width: 1200px;
-}
-
-.chart-container {
-    position: relative;
-    height: 300px;
-}
-
-@media (max-width: 768px) {
-    .card {
-        margin-bottom: 1rem;
-    }
+    padding: 20px;
 }
