@@ -35,6 +35,36 @@
             background-color: #17a2b8;
             color: #ffffff;
         }
+        @media print {
+            .navbar, form, .btn, .no-print {
+                display: none !important;
+            }
+            .container {
+                margin-top: 0;
+            }
+            .card {
+                border: none;
+                box-shadow: none;
+            }
+            .card-body {
+                padding: 0;
+            }
+            .table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            .table th, .table td {
+                border: 1px solid #000;
+                padding: 8px;
+            }
+            h5.card-title {
+                font-size: 18px;
+                margin-bottom: 10px;
+            }
+            p {
+                font-size: 14px;
+            }
+        }
     </style>
 </head>
 <body>

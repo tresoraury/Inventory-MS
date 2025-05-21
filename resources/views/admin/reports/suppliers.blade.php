@@ -8,7 +8,7 @@
 <div class="card">
     <div class="card-body">
         <h5 class="card-title">Suppliers Report</h5>
-        <form method="GET" action="{{ route('reports.suppliers') }}" class="mb-4">
+        <form method="GET" action="{{ route('reports.suppliers') }}" class="mb-4 no-print">
             <div class="row">
                 <div class="col-md-4">
                     <label for="supplier_id">Select Supplier</label>
@@ -31,6 +31,7 @@
                 </div>
                 <div class="col-md-2 align-self-end">
                     <button type="submit" class="btn btn-primary">Filter</button>
+                    <button type="button" class="btn btn-secondary" onclick="window.print()">Print</button>
                 </div>
             </div>
         </form>
