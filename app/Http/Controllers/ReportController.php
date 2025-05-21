@@ -2,49 +2,79 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Materiaux;
-use App\Models\Produits;
+use App\Models\Operation;
+use App\Models\Product;
 use App\Models\Sale;
+use App\Models\Supplier;
+use Illuminate\Http\Request;
 
 class ReportController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        
-        $inventoryLevels = Materiaux::all();
-        $salesTrends = []; 
-        $bestSellingProducts = []; 
-
-        return view('reports.index', compact('inventoryLevels', 'salesTrends', 'bestSellingProducts'));
+        return view('admin.reports.index');
     }
 
-    public function generateReport(Request $request)
+    public function products(Request $request)
     {
-        $request->validate([
-            'start_date' => 'required|date',
-            'end_date' => 'required|date',
-            'report_type' => 'required|in:product,operation,sale', 
-        ]);
+        $query = Product::with('category', 'supplier');
+        if ($request->has('start_date') && $request->has('end_date')) {
+            $startDate = $request->query('start_date');
+            $endDate = $request->query('end_date');
+            $query->whereBetween('created_at', [$startDate, $endDate . ' 23:59:59']);
+        }
+        $products = $query->get();
+        $startDate = $request->query('start_date');
+        $endDate = $request->query('end_date');
+        return view('admin.reports.products', compact('products', 'startDate', 'endDate'));
+    }
 
-        $reports = [];
-        $report_type = $request->report_type;
+    public function operations(Request $request)
+    {
+        $query = Operation::with('product', 'operationType', 'supplier');
+        if ($request->has('start_date') && $request->has('end_date')) {
+            $startDate = $request->query('start_date');
+            $endDate = $request->query('end_date');
+            $query->whereBetween('operation_date', [$startDate, $endDate]);
+        }
+        $operations = $query->get();
+        $startDate = $request->query('start_date');
+        $endDate = $request->query('end_date');
+        return view('admin.reports.operations', compact('operations', 'startDate', 'endDate'));
+    }
 
-        if ($report_type == 'product') {
-            $reports = Produits::whereBetween('date_operation', [$request->start_date, $request->end_date])
-                ->with('materiel')
-                ->get(['date_operation as report_date', 'materiel_id', 'quantite']);
-        } elseif ($report_type == 'operation') {
-            $reports = Produits::whereBetween('date_operation', [$request->start_date, $request->end_date])
-                ->with(['materiel', 'type'])
-                ->get(['date_operation as report_date', 'partenaire', 'materiel_id', 'quantite', 'type_operation']);
-        } elseif ($report_type == 'sale') {
-            $reports = Sale::where('created_at', '>=', $request->start_date)
-                ->where('created_at', '<', date('Y-m-d', strtotime($request->end_date . ' +1 day')))
-                ->with('materiaux')
-                ->get(['id', 'materiaux_id', 'quantity', 'client_name', 'total', 'created_at as report_date']);
+    public function sales(Request $request)
+    {
+        $query = Sale::with('product');
+        if ($request->has('start_date') && $request->has('end_date')) {
+            $startDate = $request->query('start_date');
+            $endDate = $request->query('end_date');
+            $query->whereBetween('created_at', [$startDate, $endDate . ' 23:59:59']);
+        }
+        $sales = $query->get();
+        $startDate = $request->query('start_date');
+        $endDate = $request->query('end_date');
+        return view('admin.reports.sales', compact('sales', 'startDate', 'endDate'));
+    }
+
+    public function suppliers(Request $request)
+    {
+        $suppliers = Supplier::all();
+        $products = collect();
+        $selectedSupplier = null;
+        $startDate = $request->query('start_date');
+        $endDate = $request->query('end_date');
+
+        if ($request->has('supplier_id')) {
+            $supplierId = $request->query('supplier_id');
+            $selectedSupplier = Supplier::find($supplierId);
+            $query = Product::where('supplier_id', $supplierId)->with('category', 'supplier');
+            if ($request->has('start_date') && $request->has('end_date')) {
+                $query->whereBetween('created_at', [$startDate, $endDate . ' 23:59:59']);
+            }
+            $products = $query->get();
         }
 
-        return view('reports.index', compact('reports', 'report_type'));
+        return view('admin.reports.suppliers', compact('suppliers', 'products', 'selectedSupplier', 'startDate', 'endDate'));
     }
 }

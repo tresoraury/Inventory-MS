@@ -10,6 +10,7 @@ use App\Http\Controllers\OperationTypeController;
 use App\Http\Controllers\POSController;
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
@@ -46,6 +47,14 @@ Route::group(['middleware' => ['auth', 'admin']], function () {
     });
 
     Route::get('/low-stock', [ProductController::class, 'lowStock'])->name('low_stock');
+});
+
+Route::group(['middleware' => ['auth']], function () {
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index')->middleware('permission:view reports');
+    Route::get('/reports/products', [ReportController::class, 'products'])->name('reports.products')->middleware('permission:view reports');
+    Route::get('/reports/operations', [ReportController::class, 'operations'])->name('reports.operations')->middleware('permission:view reports');
+    Route::get('/reports/sales', [ReportController::class, 'sales'])->name('reports.sales')->middleware('permission:view reports');
+    Route::get('/reports/suppliers', [ReportController::class, 'suppliers'])->name('reports.suppliers')->middleware('permission:view reports');
 });
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
