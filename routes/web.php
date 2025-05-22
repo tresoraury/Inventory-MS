@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\PurchaseOrderController;
+use App\Http\Controllers\CustomerController;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -47,10 +48,15 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('suppliers', SupplierController::class)->middleware('permission:manage products');
     Route::resource('operation_types', OperationTypeController::class)->middleware('permission:manage operation types');
     Route::resource('operations', OperationController::class)->middleware('permission:manage stock');
+    Route::resource('customers', CustomerController::class)->middleware('permission:manage customers');
 
     Route::prefix('pos')->group(function () {
         Route::get('/', [POSController::class, 'index'])->name('pos.index')->middleware('permission:manage sales');
+        Route::get('/create', [POSController::class, 'create'])->name('pos.create')->middleware('permission:manage sales');
         Route::post('/', [POSController::class, 'store'])->name('pos.store')->middleware('permission:manage sales');
+        Route::get('/{sale}/edit', [POSController::class, 'edit'])->name('pos.edit')->middleware('permission:manage sales');
+        Route::put('/{sale}', [POSController::class, 'update'])->name('pos.update')->middleware('permission:manage sales');
+        Route::delete('/{sale}', [POSController::class, 'destroy'])->name('pos.destroy')->middleware('permission:manage sales');
     });
 
     Route::get('/low-stock', [ProductController::class, 'lowStock'])->name('low_stock')->middleware('permission:manage products');
