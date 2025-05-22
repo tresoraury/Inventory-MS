@@ -24,7 +24,7 @@
                         @foreach ($purchaseOrders as $purchaseOrder)
                             <tr>
                                 <td>{{ $purchaseOrder->id }}</td>
-                                <td>{{ $purchaseOrder->supplier->name }}</td>
+                                <td>{{ $purchaseOrder->supplier->name ?? 'N/A' }}</td>
                                 <td>{{ ucfirst($purchaseOrder->status) }}</td>
                                 <td>{{ $purchaseOrder->created_at->format('Y-m-d') }}</td>
                                 <td>
@@ -40,6 +40,11 @@
                                             <button type="submit" class="btn btn-sm btn-danger">Cancel</button>
                                         </form>
                                     @endif
+                                    <form action="{{ route('purchase_orders.destroy', $purchaseOrder) }}" method="POST" style="display:inline;">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this purchase order?')">Delete</button>
+                                    </form>
                                 </td>
                             </tr>
                         @endforeach

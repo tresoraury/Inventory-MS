@@ -58,6 +58,9 @@ class PurchaseOrderController extends Controller
 
     public function edit(PurchaseOrder $purchaseOrder)
     {
+        if ($purchaseOrder->status !== 'pending') {
+            return redirect()->route('purchase_orders.index')->with('error', 'Only pending purchase orders can be edited.');
+        }
         $suppliers = Supplier::all();
         $products = Product::all();
         $purchaseOrder->load('items.product');
@@ -66,6 +69,10 @@ class PurchaseOrderController extends Controller
 
     public function update(Request $request, PurchaseOrder $purchaseOrder)
     {
+        if ($purchaseOrder->status !== 'pending') {
+            return redirect()->route('purchase_orders.index')->with('error', 'Only pending purchase orders can be edited.');
+        }
+
         $request->validate([
             'supplier_id' => 'required|exists:suppliers,id',
             'products' => 'required|array',
@@ -91,6 +98,8 @@ class PurchaseOrderController extends Controller
 
     public function destroy(PurchaseOrder $purchaseOrder)
     {
+        // Delete associated items to avoid foreign key constraint
+        $purchaseOrder->items()->delete();
         $purchaseOrder->delete();
         return redirect()->route('purchase_orders.index')->with('success', 'Purchase Order deleted.');
     }
@@ -98,7 +107,7 @@ class PurchaseOrderController extends Controller
     public function receive(PurchaseOrder $purchaseOrder)
     {
         if ($purchaseOrder->status !== 'pending') {
-            return back()->with('error', 'Purchase Order is not pending.');
+            return redirect()->route('purchase_orders.index')->with('error', 'Purchase Order is not pending.');
         }
 
         $operationType = OperationType::where('name', 'stock-in')->firstOrFail();
@@ -124,7 +133,7 @@ class PurchaseOrderController extends Controller
     public function cancel(PurchaseOrder $purchaseOrder)
     {
         if ($purchaseOrder->status !== 'pending') {
-            return back()->with('error', 'Purchase Order is not pending.');
+            return redirect()->route('purchase_orders.index')->with('error', 'Purchase Order is not pending.');
         }
 
         $purchaseOrder->update(['status' => 'canceled']);
