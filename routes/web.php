@@ -11,6 +11,7 @@ use App\Http\Controllers\POSController;
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\PurchaseOrderController;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -59,6 +60,18 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/reports/operations', [ReportController::class, 'operations'])->name('reports.operations')->middleware('permission:view reports');
     Route::get('/reports/sales', [ReportController::class, 'sales'])->name('reports.sales')->middleware('permission:view reports');
     Route::get('/reports/suppliers', [ReportController::class, 'suppliers'])->name('reports.suppliers')->middleware('permission:view reports');
+
+    Route::middleware(['permission:manage purchase orders'])->group(function () {
+        Route::get('/purchase-orders', [PurchaseOrderController::class, 'index'])->name('purchase_orders.index');
+        Route::get('/purchase-orders/create', [PurchaseOrderController::class, 'create'])->name('purchase_orders.create');
+        Route::post('/purchase-orders', [PurchaseOrderController::class, 'store'])->name('purchase_orders.store');
+        Route::get('/purchase-orders/{purchaseOrder}', [PurchaseOrderController::class, 'show'])->name('purchase_orders.show');
+        Route::get('/purchase-orders/{purchaseOrder}/edit', [PurchaseOrderController::class, 'edit'])->name('purchase_orders.edit');
+        Route::put('/purchase-orders/{purchaseOrder}', [PurchaseOrderController::class, 'update'])->name('purchase_orders.update');
+        Route::delete('/purchase-orders/{purchaseOrder}', [PurchaseOrderController::class, 'destroy'])->name('purchase_orders.destroy');
+        Route::post('/purchase-orders/{purchaseOrder}/receive', [PurchaseOrderController::class, 'receive'])->name('purchase_orders.receive');
+        Route::post('/purchase-orders/{purchaseOrder}/cancel', [PurchaseOrderController::class, 'cancel'])->name('purchase_orders.cancel');
+    });
 });
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

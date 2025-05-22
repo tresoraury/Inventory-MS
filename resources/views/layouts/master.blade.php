@@ -112,6 +112,11 @@
                             <a class="nav-link {{ Route::is('low_stock') ? 'active' : '' }}" href="{{ route('low_stock') }}">Low Stock</a>
                         </li>
                     @endcan
+                    @can('manage purchase orders')
+                        <li class="nav-item">
+                            <a class="nav-link {{ Route::is('purchase_orders.*') ? 'active' : '' }}" href="{{ route('purchase_orders.index') }}">Purchase Orders</a>
+                        </li>
+                    @endcan
                     @can('manage users')
                         <li class="nav-item">
                             <a class="nav-link {{ Route::is('roles.*') ? 'active' : '' }}" href="{{ route('roles.index') }}">Roles</a>

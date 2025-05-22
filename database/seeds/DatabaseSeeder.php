@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Supplier;
 use App\Models\Product;
 use App\Models\OperationType;
+use Spatie\Permission\Models\Permission;
 
 class DatabaseSeeder extends Seeder
 {
@@ -16,6 +17,8 @@ class DatabaseSeeder extends Seeder
             RolePermissionSeeder::class,
             OperationTypeSeeder::class,
         ]);
+
+        Permission::firstOrCreate(['name' => 'manage purchase orders'], ['guard_name' => 'web']);
 
         Category::create(['name' => 'Electronics', 'description' => 'Electronic products']);
         Category::create(['name' => 'Clothing', 'description' => 'Clothing items']);

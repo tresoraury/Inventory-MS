@@ -12,5 +12,6 @@ class OperationTypeSeeder extends Seeder
         OperationType::firstOrCreate(['name' => 'purchase'], ['description' => 'Stock purchase']);
         OperationType::firstOrCreate(['name' => 'sale'], ['description' => 'Stock sale']);
         OperationType::firstOrCreate(['name' => 'adjustment'], ['description' => 'Stock adjustment']);
+        OperationType::firstOrCreate(['name' => 'stock-in'], ['description' => 'Stock received from supplier']);
     }
 }
