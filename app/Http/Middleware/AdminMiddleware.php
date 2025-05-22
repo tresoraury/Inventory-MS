@@ -13,6 +13,6 @@ class AdminMiddleware
         if (Auth::check() && Auth::user()->hasRole('admin')) {
             return $next($request);
         }
-        return redirect('/')->with('error', 'Unauthorized access.');
+        return redirect()->route('home')->with('error', 'Unauthorized access.');
     }
 }

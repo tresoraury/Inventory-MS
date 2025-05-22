@@ -76,41 +76,57 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link {{ Route::is('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ Route::is('products.*') ? 'active' : '' }}" href="{{ route('products.index') }}">Products</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ Route::is('categories.*') ? 'active' : '' }}" href="{{ route('categories.index') }}">Categories</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ Route::is('suppliers.*') ? 'active' : '' }}" href="{{ route('suppliers.index') }}">Suppliers</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ Route::is('operation_types.*') ? 'active' : '' }}" href="{{ route('operation_types.index') }}">Operation Types</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ Route::is('operations.*') ? 'active' : '' }}" href="{{ route('operations.index') }}">Operations</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ Route::is('pos.*') ? 'active' : '' }}" href="{{ route('pos.index') }}">POS</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ Route::is('low_stock') ? 'active' : '' }}" href="{{ route('low_stock') }}">Low Stock</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ Route::is('roles.*') ? 'active' : '' }}" href="{{ route('roles.index') }}">Roles</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ Route::is('role.*') ? 'active' : '' }}" href="{{ route('role.register') }}">Users</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ Route::is('reports.*') ? 'active' : '' }}" href="{{ route('reports.index') }}">
-                            <i class="fas fa-chart-bar"></i> Reports
-                        </a>
-                    </li>
+                    @can('view dashboard')
+                        <li class="nav-item">
+                            <a class="nav-link {{ Route::is('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">Dashboard</a>
+                        </li>
+                    @endcan
+                    @can('manage products')
+                        <li class="nav-item">
+                            <a class="nav-link {{ Route::is('products.*') ? 'active' : '' }}" href="{{ route('products.index') }}">Products</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ Route::is('categories.*') ? 'active' : '' }}" href="{{ route('categories.index') }}">Categories</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ Route::is('suppliers.*') ? 'active' : '' }}" href="{{ route('suppliers.index') }}">Suppliers</a>
+                        </li>
+                    @endcan
+                    @can('manage operation types')
+                        <li class="nav-item">
+                            <a class="nav-link {{ Route::is('operation_types.*') ? 'active' : '' }}" href="{{ route('operation_types.index') }}">Operation Types</a>
+                        </li>
+                    @endcan
+                    @can('manage stock')
+                        <li class="nav-item">
+                            <a class="nav-link {{ Route::is('operations.*') ? 'active' : '' }}" href="{{ route('operations.index') }}">Operations</a>
+                        </li>
+                    @endcan
+                    @can('manage sales')
+                        <li class="nav-item">
+                            <a class="nav-link {{ Route::is('pos.*') ? 'active' : '' }}" href="{{ route('pos.index') }}">POS</a>
+                        </li>
+                    @endcan
+                    @can('manage products')
+                        <li class="nav-item">
+                            <a class="nav-link {{ Route::is('low_stock') ? 'active' : '' }}" href="{{ route('low_stock') }}">Low Stock</a>
+                        </li>
+                    @endcan
+                    @can('manage users')
+                        <li class="nav-item">
+                            <a class="nav-link {{ Route::is('roles.*') ? 'active' : '' }}" href="{{ route('roles.index') }}">Roles</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ Route::is('role.*') ? 'active' : '' }}" href="{{ route('role.register') }}">Users</a>
+                        </li>
+                    @endcan
+                    @can('view reports')
+                        <li class="nav-item">
+                            <a class="nav-link {{ Route::is('reports.*') ? 'active' : '' }}" href="{{ route('reports.index') }}">
+                                <i class="fas fa-chart-bar"></i> Reports
+                            </a>
+                        </li>
+                    @endcan
                 </ul>
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item dropdown">
