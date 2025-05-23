@@ -1,0 +1,60 @@
+body.login-body {
+    background: url('/images/background.jpg') no-repeat center center fixed;
+    background-size: cover;
+    min-height: 100vh;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.navbar-dark {
+    background-color: #343a40 !important;
+}
+
+.login-card {
+    max-width: 450px;
+    width: 100%;
+    border: none;
+    border-radius: 15px;
+    background: #ffffff;
+}
+
+.form-control {
+    padding: 12px 20px;
+    font-size: 1rem;
+}
+
+.form-control:focus {
+    border-color: #17a2b8;
+    box-shadow: 0 0 0 0.2rem rgba(23, 162, 184, 0.25);
+}
+
+.btn-primary {
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+    padding: 12px;
+    font-size: 1.1rem;
+}
+
+.btn-primary:hover {
+    background-color: #138496;
+    border-color: #138496;
+}
+
+.form-check-label {
+    font-size: 0.9rem;
+}
+
+.text-muted {
+    font-size: 0.9rem;
+}
+
+@media (max-width: 576px) {
+    .login-card {
+        margin: 15px;
+        padding: 10px;
+    }
+    .card-body {
+        padding: 20px !important;
+    }
+}
