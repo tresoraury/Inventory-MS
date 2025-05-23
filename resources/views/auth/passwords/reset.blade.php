@@ -1,47 +1,70 @@
-@extends('layouts.app')
-@section('content')
-<div class="container">
-    <div class="row">
-        <div class="col s12 m10 offset-m1 l8 offset-l2">
-            <div class="card">
-            <form  method="POST" action="{{ route('password.update') }}">
-                <div class="card-content">
-                    {{ csrf_field() }}
-                    <input type="hidden" name="token" value="{{ $token }}">
-                    <span class="card-title">{{ __('Reset Password') }}</span>
-                    <hr>
-                    <div class="row">
-                        <div class="input-field col s12">
-                            <i class="material-icons prefix">mail</i>
-                            <input id="email" type="email" name="email" value="{{ old('email') }}" class="{{ $errors->has('email') ? 'invalid' : '' }}" required>
-                            <label for="email">{{ __('E-Mail Address') }}</label>
-                            <span class="red-text">{{ $errors->has('email') ? $errors->first('email'): '' }}</span>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="input-field col s12">
-                            <i class="material-icons prefix">lock</i>
-                            <input id="password" type="password" name="password" class="{{ $errors->has('password') ? 'invalid' : '' }}" required>
-                            <label for="password">{{ __('Password') }}</label>
-                            <span class="red-text">{{ $errors->has('password') ? $errors->first('password'): '' }}</span>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="input-field col s12">
-                            <i class="material-icons prefix">lock</i>
-                            <input id="password-confirm" type="password" name="password_confirmation" required>
-                            <label for="password-confirm">{{ __('Confirm Password') }}</label>
-                        </div>
-                    </div>
-                    <p>
-                        <button class="btn waves-effect waves-light" type="submit" name="action">{{ __('Reset Password') }}
-                            <i class="material-icons right">lock_open</i>
-                        </button>
-                    </p>
-                </div>
-            </form>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reset Password - Inventory MS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ asset('css/login.css') }}" rel="stylesheet">
+</head>
+<body class="login-body">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url('/') }}">Inventory MS</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('login') }}">Login</a>
+                    </li>
+                    @if (Route::has('register'))
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('register') }}">Register</a>
+                        </li>
+                    @endif
+                </ul>
+            </div>
         </div>
+    </nav>
+
+    <div class="container d-flex justify-content-center align-items-center min-vh-100">
+        <div class="card login-card shadow-lg">
+            <div class="card-body p-5">
+                <h2 class="card-title text-center mb-4">Set New Password</h2>
+                <form method="POST" action="{{ route('password.update') }}">
+                    @csrf
+                    <input type="hidden" name="token" value="{{ $request->route('token') }}">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">{{ __('E-Mail Address') }}</label>
+                        <input id="email" type="email" class="form-control rounded-pill @error('email') is-invalid @enderror" name="email" value="{{ $request->email ?? old('email') }}" required autocomplete="email">
+                        @error('email')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">{{ __('Password') }}</label>
+                        <input id="password" type="password" class="form-control rounded-pill @error('password') is-invalid @enderror" name="password" required autocomplete="new-password">
+                        @error('password')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="mb-3">
+                        <label for="password-confirm" class="form-label">{{ __('Confirm Password') }}</label>
+                        <input id="password-confirm" type="password" class="form-control rounded-pill" name="password_confirmation" required autocomplete="new-password">
+                    </div>
+                    <div class="d-grid mb-3">
+                        <button type="submit" class="btn btn-primary btn-lg rounded-pill">{{ __('Reset Password') }}</button>
+                    </div>
+                    <div class="text-center">
+                        <a class="text-muted" href="{{ route('login') }}">{{ __('Back to Login') }}</a>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
-@endsection
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

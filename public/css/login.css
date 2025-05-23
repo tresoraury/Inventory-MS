@@ -49,6 +49,11 @@ body.login-body {
     font-size: 0.9rem;
 }
 
+.alert {
+    font-size: 0.9rem;
+    padding: 10px;
+}
+
 @media (max-width: 576px) {
     .login-card {
         margin: 15px;

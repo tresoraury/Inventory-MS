@@ -1,41 +1,63 @@
-@extends('layouts.app')
-@section('content')
-<div class="container">
-    @if (session('status'))
-        <div class="card">
-            <div class="card green darken-1">
-                <div class="card-content white-text">
-                    {{ session('status') }}
-                </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forgot Password - Inventory MS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ asset('css/login.css') }}" rel="stylesheet">
+</head>
+<body class="login-body">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url('/') }}">Inventory MS</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('login') }}">Login</a>
+                    </li>
+                    @if (Route::has('register'))
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('register') }}">Register</a>
+                        </li>
+                    @endif
+                </ul>
             </div>
         </div>
-    @endif
-    <div class="row">
-        <div class="col s12 m10 offset-m1 l8 offset-l2">
-            <div class="card">
-            <form  method="POST" action="{{ route('password.email') }}">
-                <div class="card-content">
-                    {{ csrf_field() }}
-                    <span class="card-title">{{ __('Reset Password') }}</span>
-                    <hr>
-                    <div class="row">
-                        <div class="input-field col s12">
-                            <i class="material-icons prefix">mail</i>
-                            <input id="email" type="email" name="email" value="{{ old('email') }}" class="{{ $errors->has('email') ? 'invalid' : '' }}" required autofocus>
-                            <label for="email">{{ __('E-Mail Address') }}</label>
-                            <span class="red-text">{{ $errors->has('email') ? $errors->first('email'): '' }}</span>
-                        </div>
+    </nav>
+
+    <div class="container d-flex justify-content-center align-items-center min-vh-100">
+        <div class="card login-card shadow-lg">
+            <div class="card-body p-5">
+                <h2 class="card-title text-center mb-4">Reset Your Password</h2>
+                @if (session('status'))
+                    <div class="alert alert-success mb-3" role="alert">
+                        {{ session('status') }}
                     </div>
-                    <p>
-                        <button class="btn waves-effect waves-light right" type="submit" name="action">{{ __('Send Password Reset Link') }}
-                            <i class="material-icons right">lock_open</i>
-                        </button>
-                    </p>
-                    <br><br>
-                </div>
-            </form>
-        </div>
+                @endif
+                <form method="POST" action="{{ route('password.email') }}">
+                    @csrf
+                    <div class="mb-3">
+                        <label for="email" class="form-label">{{ __('E-Mail Address') }}</label>
+                        <input id="email" type="email" class="form-control rounded-pill @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
+                        @error('email')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="d-grid mb-3">
+                        <button type="submit" class="btn btn-primary btn-lg rounded-pill">{{ __('Send Password Reset Link') }}</button>
+                    </div>
+                    <div class="text-center">
+                        <a class="text-muted" href="{{ route('login') }}">{{ __('Back to Login') }}</a>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
-@endsection
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
