@@ -11,10 +11,15 @@ use App\Models\CartItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Cache;
 
 class POSController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware('permission:manage sales', ['only' => ['index', 'create', 'store', 'edit', 'update', 'destroy', 'confirmSale', 'addToCart', 'removeFromCart', 'clearCart', 'view', 'searchProducts']]);
+    }
+
     public function index()
     {
         $products = Product::all();
@@ -30,6 +35,8 @@ class POSController extends Controller
 
     public function create()
     {
+        $this->cleanupCart();
+        Log::info('Current session ID', ['session_id' => Session::getId()]);
         $customers = Customer::all();
         $cartItems = CartItem::where('session_id', Session::getId())->with('product')->get();
         return view('pos.create', compact('customers', 'cartItems'));
@@ -38,14 +45,13 @@ class POSController extends Controller
     public function searchProducts(Request $request)
     {
         $query = $request->input('query');
-        $limit = $request->input('limit', null);
         $products = Product::when($query, function ($q) use ($query) {
             return $q->where('name', 'LIKE', "%{$query}%")
                      ->orWhere('code', 'LIKE', "%{$query}%");
         })
         ->select('id', 'name', 'code', 'price', 'stock_quantity')
-        ->take($limit ?? 50)
         ->get();
+        Log::info('searchProducts called', ['query' => $query, 'results' => $products->toArray()]);
         return response()->json($products);
     }
 
@@ -59,10 +65,13 @@ class POSController extends Controller
         $product = Product::findOrFail($request->product_id);
 
         if ($product->stock_quantity < $request->quantity) {
+            Log::warning('addToCart: Insufficient stock', ['product_id' => $request->product_id, 'requested' => $request->quantity, 'available' => $product->stock_quantity]);
             return redirect()->route('pos.create')->with('error', 'Insufficient stock for ' . $product->name);
         }
 
         $sessionId = Session::getId();
+        Log::info('addToCart called', ['session_id' => $sessionId, 'product_id' => $request->product_id, 'quantity' => $request->quantity]);
+
         $cartItem = CartItem::where('session_id', $sessionId)
             ->where('product_id', $request->product_id)
             ->first();
@@ -70,6 +79,7 @@ class POSController extends Controller
         if ($cartItem) {
             $newQuantity = $cartItem->quantity + $request->quantity;
             if ($product->stock_quantity < $newQuantity) {
+                Log::warning('addToCart: Insufficient stock for update', ['product_id' => $request->product_id, 'new_quantity' => $newQuantity, 'available' => $product->stock_quantity]);
                 return redirect()->route('pos.create')->with('error', 'Insufficient stock for ' . $product->name);
             }
             $cartItem->update(['quantity' => $newQuantity]);
@@ -86,20 +96,29 @@ class POSController extends Controller
 
     public function removeFromCart($id)
     {
-        Log::info('removeFromCart called', ['id' => $id, 'session_id' => Session::getId()]);
+        Log::info('Attempting to remove cart item', ['id' => $id, 'session_id' => Session::getId()]);
         try {
-            $cartItem = CartItem::where('session_id', Session::getId())->where('id', $id)->firstOrFail();
+            $cartItem = CartItem::where('session_id', Session::getId())
+                                ->where('id', $id)
+                                ->first();
+            
+            if (!$cartItem) {
+                Log::warning('Cart item not found for session', ['id' => $id, 'session_id' => Session::getId()]);
+                return redirect()->route('pos.create')->with('error', 'Cart item not found.');
+            }
+            
             $cartItem->delete();
-            Log::info('Cart item removed', ['id' => $id]);
+            Log::info('Cart item removed successfully', ['id' => $id]);
             return redirect()->route('pos.create')->with('success', 'Product removed from cart.');
         } catch (\Exception $e) {
-            Log::error('removeFromCart failed', ['id' => $id, 'error' => $e->getMessage()]);
+            Log::error('Failed to remove cart item', ['id' => $id, 'error' => $e->getMessage()]);
             return redirect()->route('pos.create')->with('error', 'Failed to remove product: ' . $e->getMessage());
         }
     }
 
     public function clearCart()
     {
+        Log::info('clearCart called', ['session_id' => Session::getId()]);
         CartItem::where('session_id', Session::getId())->delete();
         return redirect()->route('pos.create')->with('success', 'Cart cleared.');
     }
@@ -123,14 +142,19 @@ class POSController extends Controller
 
             foreach ($cartItems as $item) {
                 $product = $item->product;
+                if (!$product) {
+                    Log::warning('confirmSale: Product not found', ['product_id' => $item->product_id]);
+                    return redirect()->route('pos.create')->with('error', 'Product not found for cart item ID ' . $item->id);
+                }
+
                 if ($product->stock_quantity < $item->quantity) {
-                    Log::warning('confirmSale: Insufficient stock', ['product_id' => $item->product_id]);
+                    Log::warning('confirmSale: Insufficient stock', ['product_id' => $item->product_id, 'requested' => $item->quantity, 'available' => $product->stock_quantity]);
                     return redirect()->route('pos.create')->with('error', 'Insufficient stock for ' . $product->name);
                 }
 
                 $totalPrice = $product->price * $item->quantity;
                 if ($totalPrice > 99999999.99) {
-                    Log::warning('confirmSale: Price exceeds max', ['product_id' => $item->product_id]);
+                    Log::warning('confirmSale: Price exceeds max', ['product_id' => $item->product_id, 'total_price' => $totalPrice]);
                     return redirect()->route('pos.create')->with('error', 'Total price exceeds maximum for ' . $product->name);
                 }
 
@@ -184,12 +208,14 @@ class POSController extends Controller
             $product = Product::findOrFail($request->product_id);
 
             if ($product->stock_quantity < $request->quantity) {
+                Log::warning('store: Insufficient stock', ['product_id' => $request->product_id, 'requested' => $request->quantity, 'available' => $product->stock_quantity]);
                 return redirect()->route('pos.index')->with('error', 'Insufficient stock for ' . $product->name);
             }
 
             $totalPrice = $product->price * $request->quantity;
 
             if ($totalPrice > 99999999.99) {
+                Log::warning('store: Price exceeds max', ['product_id' => $request->product_id, 'total_price' => $totalPrice]);
                 return redirect()->route('pos.index')->with('error', 'Total price exceeds maximum allowed value.');
             }
 
@@ -214,14 +240,14 @@ class POSController extends Controller
                     'operation_date' => now(),
                 ]);
             } else {
-                Log::warning('OperationType "stock-out" not found. Operation not recorded for sale ID: ' . $sale->id);
+                Log::warning('store: OperationType "stock-out" not found', ['sale_id' => $sale->id]);
             }
 
             return redirect()->route('pos.index')
                 ->with('success', 'Sale recorded successfully.')
                 ->with('sale_id', $sale->id);
         } catch (\Exception $e) {
-            Log::error('Sale store failed: ' . $e->getMessage());
+            Log::error('store failed', ['error' => $e->getMessage()]);
             return redirect()->route('pos.index')
                 ->with('error', 'Failed to record sale: ' . $e->getMessage())
                 ->with('sale_id', isset($sale) ? $sale->id : null);
@@ -251,12 +277,14 @@ class POSController extends Controller
             $oldProduct->save();
 
             if ($product->stock_quantity < $request->quantity) {
+                Log::warning('update: Insufficient stock', ['product_id' => $request->product_id, 'requested' => $request->quantity, 'available' => $product->stock_quantity]);
                 return redirect()->route('pos.index')->with('error', 'Insufficient stock for ' . $product->name);
             }
 
             $totalPrice = $product->price * $request->quantity;
 
             if ($totalPrice > 99999999.99) {
+                Log::warning('update: Price exceeds max', ['product_id' => $request->product_id, 'total_price' => $totalPrice]);
                 return redirect()->route('pos.index')->with('error', 'Total price exceeds maximum allowed value.');
             }
 
@@ -282,12 +310,12 @@ class POSController extends Controller
                         'operation_date' => now(),
                     ]);
             } else {
-                Log::warning('OperationType "stock-out" not found. Operation not updated for sale ID: ' . $sale->id);
+                Log::warning('update: OperationType "stock-out" not found', ['sale_id' => $sale->id]);
             }
 
             return redirect()->route('pos.index')->with('success', 'Sale updated successfully.');
         } catch (\Exception $e) {
-            Log::error('Sale update failed: ' . $e->getMessage());
+            Log::error('update failed', ['error' => $e->getMessage()]);
             return redirect()->route('pos.index')->with('error', 'Failed to update sale: ' . $e->getMessage());
         }
     }
@@ -303,8 +331,19 @@ class POSController extends Controller
 
             return redirect()->route('pos.index')->with('success', 'Sale deleted successfully.');
         } catch (\Exception $e) {
-            Log::error('Sale delete failed: ' . $e->getMessage());
+            Log::error('destroy failed', ['error' => $e->getMessage()]);
             return redirect()->route('pos.index')->with('error', 'Failed to delete sale: ' . $e->getMessage());
+        }
+    }
+
+    public function cleanupCart()
+    {
+        try {
+            $expiredTime = now()->subHours(24);
+            CartItem::where('updated_at', '<', $expiredTime)->delete();
+            Log::info('Cleared stale cart items older than 24 hours');
+        } catch (\Exception $e) {
+            Log::error('Failed to clean up cart items: ' . $e->getMessage());
         }
     }
 }
