@@ -2,16 +2,25 @@
 
 namespace App\Http\Middleware;
 
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken as BaseVerifier;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken as Middleware;
+use Illuminate\Support\Facades\Log;
 
-class VerifyCsrfToken extends BaseVerifier
+class VerifyCsrfToken extends Middleware
 {
-    /**
-     * The URIs that should be excluded from CSRF verification.
-     *
-     * @var array
-     */
     protected $except = [
         '/logout'
     ];
+
+    protected function tokensMatch($request)
+    {
+        $match = parent::tokensMatch($request);
+        if (!$match) {
+            Log::warning('CSRF token mismatch', [
+                'url' => $request->url(),
+                'method' => $request->method(),
+                'token' => $request->header('X-CSRF-TOKEN') ?: $request->input('_token'),
+            ]);
+        }
+        return $match;
+    }
 }

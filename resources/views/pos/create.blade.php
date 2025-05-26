@@ -74,14 +74,17 @@
                                 <td>{{ $item->product ? number_format($item->product->price, 2) : 'N/A' }}</td>
                                 <td>{{ $item->product ? number_format($item->product->price * $item->quantity, 2) : 'N/A' }}</td>
                                 <td>
-                                    <a href="{{ route('pos.remove-from-cart', $item->id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Remove this item?')">Remove</a>
+                                    <form action="{{ route('pos.remove-from-cart', $item->id) }}" method="POST" style="display:inline;">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Remove this item?')">Remove</button>
+                                    </form>
                                 </td>
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
                 <div class="mb-3">
-                    <a href="{{ route('pos.clear-cart') }}" class="btn btn-warning" onclick="return confirm('Clear cart?')">Clear Cart</a>
                     <button type="submit" class="btn btn-success">Confirm Sale</button>
                 </div>
             </form>
@@ -89,8 +92,8 @@
     </div>
 
     <link href="{{ asset('vendor/select2/select2.min.css') }}" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="{{ asset('vendor/select2/select2.min.js') }}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" defer></script>
+    <script src="{{ asset('vendor/select2/select2.min.js') }}" defer></script>
     <script>
         $(document).ready(function() {
             $('#product-search').select2({

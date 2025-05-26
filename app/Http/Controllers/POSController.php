@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Cache;
 
-
 class POSController extends Controller
 {
     public function index()
@@ -45,6 +44,7 @@ class POSController extends Controller
                      ->orWhere('code', 'LIKE', "%{$query}%");
         })
         ->select('id', 'name', 'code', 'price', 'stock_quantity')
+        ->take($limit ?? 50)
         ->get();
         return response()->json($products);
     }
@@ -86,9 +86,16 @@ class POSController extends Controller
 
     public function removeFromCart($id)
     {
-        $cartItem = CartItem::where('session_id', Session::getId())->where('id', $id)->firstOrFail();
-        $cartItem->delete();
-        return redirect()->route('pos.create')->with('success', 'Product removed from cart.');
+        Log::info('removeFromCart called', ['id' => $id, 'session_id' => Session::getId()]);
+        try {
+            $cartItem = CartItem::where('session_id', Session::getId())->where('id', $id)->firstOrFail();
+            $cartItem->delete();
+            Log::info('Cart item removed', ['id' => $id]);
+            return redirect()->route('pos.create')->with('success', 'Product removed from cart.');
+        } catch (\Exception $e) {
+            Log::error('removeFromCart failed', ['id' => $id, 'error' => $e->getMessage()]);
+            return redirect()->route('pos.create')->with('error', 'Failed to remove product: ' . $e->getMessage());
+        }
     }
 
     public function clearCart()
@@ -99,6 +106,7 @@ class POSController extends Controller
 
     public function confirmSale(Request $request)
     {
+        Log::info('confirmSale called', ['session_id' => Session::getId(), 'input' => $request->all()]);
         try {
             $request->validate([
                 'customer_id' => 'nullable|exists:customers,id',
@@ -106,6 +114,7 @@ class POSController extends Controller
 
             $cartItems = CartItem::where('session_id', Session::getId())->with('product')->get();
             if ($cartItems->isEmpty()) {
+                Log::warning('confirmSale: Cart is empty');
                 return redirect()->route('pos.create')->with('error', 'Cart is empty.');
             }
 
@@ -115,11 +124,13 @@ class POSController extends Controller
             foreach ($cartItems as $item) {
                 $product = $item->product;
                 if ($product->stock_quantity < $item->quantity) {
+                    Log::warning('confirmSale: Insufficient stock', ['product_id' => $item->product_id]);
                     return redirect()->route('pos.create')->with('error', 'Insufficient stock for ' . $product->name);
                 }
 
                 $totalPrice = $product->price * $item->quantity;
                 if ($totalPrice > 99999999.99) {
+                    Log::warning('confirmSale: Price exceeds max', ['product_id' => $item->product_id]);
                     return redirect()->route('pos.create')->with('error', 'Total price exceeds maximum for ' . $product->name);
                 }
 
@@ -143,19 +154,20 @@ class POSController extends Controller
                         'operation_date' => now(),
                     ]);
                 } else {
-                    Log::warning('OperationType "stock-out" not found. Operation not recorded for sale ID: ' . $sale->id);
+                    Log::warning('confirmSale: OperationType "stock-out" not found', ['sale_id' => $sale->id]);
                 }
 
                 $sales[] = $sale->id;
             }
 
             CartItem::where('session_id', Session::getId())->delete();
+            Log::info('confirmSale: Sale confirmed', ['sale_ids' => $sales]);
 
             return redirect()->route('pos.index')
                 ->with('success', 'Sale confirmed successfully.')
                 ->with('sale_ids', $sales);
         } catch (\Exception $e) {
-            Log::error('Sale confirmation failed: ' . $e->getMessage());
+            Log::error('confirmSale failed', ['error' => $e->getMessage()]);
             return redirect()->route('pos.create')->with('error', 'Failed to confirm sale: ' . $e->getMessage());
         }
     }
