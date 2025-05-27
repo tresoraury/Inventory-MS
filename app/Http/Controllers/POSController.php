@@ -17,7 +17,7 @@ class POSController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->middleware('permission:manage sales', ['only' => ['index', 'create', 'store', 'edit', 'update', 'destroy', 'confirmSale', 'addToCart', 'removeFromCart', 'clearCart', 'view', 'searchProducts']]);
+        $this->middleware('permission:manage sales', ['only' => ['index', 'create', 'store', 'edit', 'update', 'destroy', 'confirmSale', 'addToCart', 'removeFromCart', 'view', 'searchProducts', 'clearCart']]);
     }
 
     public function index()
@@ -36,9 +36,10 @@ class POSController extends Controller
     public function create()
     {
         $this->cleanupCart();
-        Log::info('Current session ID', ['session_id' => Session::getId()]);
+        Log::info('Current session ID in create', ['session_id' => Session::getId()]);
         $customers = Customer::all();
         $cartItems = CartItem::where('session_id', Session::getId())->with('product')->get();
+        Log::info('Cart items loaded', ['cart_items' => $cartItems->toArray()]);
         return view('pos.create', compact('customers', 'cartItems'));
     }
 
@@ -84,11 +85,12 @@ class POSController extends Controller
             }
             $cartItem->update(['quantity' => $newQuantity]);
         } else {
-            CartItem::create([
+            $cartItem = CartItem::create([
                 'session_id' => $sessionId,
                 'product_id' => $request->product_id,
                 'quantity' => $request->quantity,
             ]);
+            Log::info('New cart item created', ['cart_item_id' => $cartItem->id]);
         }
 
         return redirect()->route('pos.create')->with('success', 'Product added to cart.');
@@ -96,14 +98,19 @@ class POSController extends Controller
 
     public function removeFromCart($id)
     {
-        Log::info('Attempting to remove cart item', ['id' => $id, 'session_id' => Session::getId()]);
+        $sessionId = Session::getId();
+        Log::info('removeFromCart called', ['id' => $id, 'session_id' => $sessionId]);
+        
         try {
-            $cartItem = CartItem::where('session_id', Session::getId())
+            $cartItem = CartItem::where('session_id', $sessionId)
                                 ->where('id', $id)
                                 ->first();
             
             if (!$cartItem) {
-                Log::warning('Cart item not found for session', ['id' => $id, 'session_id' => Session::getId()]);
+                Log::warning('Cart item not found', ['id' => $id, 'session_id' => $sessionId]);
+                // Log all cart items to debug
+                $allCartItems = CartItem::all()->toArray();
+                Log::info('All cart items in database', ['cart_items' => $allCartItems]);
                 return redirect()->route('pos.create')->with('error', 'Cart item not found.');
             }
             
@@ -111,29 +118,40 @@ class POSController extends Controller
             Log::info('Cart item removed successfully', ['id' => $id]);
             return redirect()->route('pos.create')->with('success', 'Product removed from cart.');
         } catch (\Exception $e) {
-            Log::error('Failed to remove cart item', ['id' => $id, 'error' => $e->getMessage()]);
+            Log::error('removeFromCart failed', ['id' => $id, 'session_id' => $sessionId, 'error' => $e->getMessage()]);
             return redirect()->route('pos.create')->with('error', 'Failed to remove product: ' . $e->getMessage());
         }
     }
 
     public function clearCart()
     {
-        Log::info('clearCart called', ['session_id' => Session::getId()]);
-        CartItem::where('session_id', Session::getId())->delete();
-        return redirect()->route('pos.create')->with('success', 'Cart cleared.');
+        try {
+            $sessionId = Session::getId();
+            Log::info('clearCart called', ['session_id' => $sessionId]);
+            CartItem::where('session_id', $sessionId)->delete();
+            Log::info('All cart items cleared for session', ['session_id' => $sessionId]);
+            return redirect()->route('pos.create')->with('success', 'Cart cleared successfully.');
+        } catch (\Exception $e) {
+            Log::error('clearCart failed', ['session_id' => $sessionId, 'error' => $e->getMessage()]);
+            return redirect()->route('pos.create')->with('error', 'Failed to clear cart: ' . $e->getMessage());
+        }
     }
 
     public function confirmSale(Request $request)
     {
-        Log::info('confirmSale called', ['session_id' => Session::getId(), 'input' => $request->all()]);
+        $sessionId = Session::getId();
+        Log::info('confirmSale method reached', ['session_id' => $sessionId, 'input' => $request->all(), 'method' => $request->method(), 'url' => $request->url()]);
+
         try {
             $request->validate([
                 'customer_id' => 'nullable|exists:customers,id',
             ]);
 
-            $cartItems = CartItem::where('session_id', Session::getId())->with('product')->get();
+            $cartItems = CartItem::where('session_id', $sessionId)->with('product')->get();
+            Log::info('Cart items for confirmSale', ['cart_items' => $cartItems->toArray()]);
+
             if ($cartItems->isEmpty()) {
-                Log::warning('confirmSale: Cart is empty');
+                Log::warning('confirmSale: Cart is empty', ['session_id' => $sessionId]);
                 return redirect()->route('pos.create')->with('error', 'Cart is empty.');
             }
 
@@ -143,7 +161,7 @@ class POSController extends Controller
             foreach ($cartItems as $item) {
                 $product = $item->product;
                 if (!$product) {
-                    Log::warning('confirmSale: Product not found', ['product_id' => $item->product_id]);
+                    Log::warning('confirmSale: Product not found', ['product_id' => $item->product_id, 'cart_item_id' => $item->id]);
                     return redirect()->route('pos.create')->with('error', 'Product not found for cart item ID ' . $item->id);
                 }
 
@@ -184,14 +202,14 @@ class POSController extends Controller
                 $sales[] = $sale->id;
             }
 
-            CartItem::where('session_id', Session::getId())->delete();
-            Log::info('confirmSale: Sale confirmed', ['sale_ids' => $sales]);
+            CartItem::where('session_id', $sessionId)->delete();
+            Log::info('confirmSale: Sale confirmed', ['session_id' => $sessionId, 'sale_ids' => $sales]);
 
             return redirect()->route('pos.index')
                 ->with('success', 'Sale confirmed successfully.')
                 ->with('sale_ids', $sales);
         } catch (\Exception $e) {
-            Log::error('confirmSale failed', ['error' => $e->getMessage()]);
+            Log::error('confirmSale failed', ['session_id' => $sessionId, 'error' => $e->getMessage()]);
             return redirect()->route('pos.create')->with('error', 'Failed to confirm sale: ' . $e->getMessage());
         }
     }
@@ -339,11 +357,16 @@ class POSController extends Controller
     public function cleanupCart()
     {
         try {
+            $sessionId = Session::getId();
+            // Delete all cart items not matching the current session
+            CartItem::where('session_id', '!=', $sessionId)->delete();
+            Log::info('Cleared cart items with non-matching session IDs', ['current_session_id' => $sessionId]);
+            // Also clear items older than 24 hours
             $expiredTime = now()->subHours(24);
             CartItem::where('updated_at', '<', $expiredTime)->delete();
             Log::info('Cleared stale cart items older than 24 hours');
         } catch (\Exception $e) {
-            Log::error('Failed to clean up cart items: ' . $e->getMessage());
+            Log::error('Failed to clean up cart items', ['error' => $e->getMessage()]);
         }
     }
 }

@@ -11,14 +11,17 @@
             <div class="alert alert-danger">{{ session('error') }}</div>
         @endif
 
-        <!-- Product Search and Add to Cart -->
-        <form action="{{ route('pos.add-to-cart') }}" method="POST" class="mb-4">
+        <!-- Add to Cart -->
+        <form action="{{ route('pos.add-to-cart') }}" method="POST" id="add-to-cart-form" class="mb-4">
             @csrf
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label for="product_id">Product</label>
                     <select name="product_id" id="product-search" class="form-control @error('product_id') is-invalid @enderror" required>
                         <option value="">Select Product</option>
+                        @foreach (\App\Models\Product::all() as $product)
+                            <option value="{{ $product->id }}">{{ $product->name }} ({{ $product->code }}) - Stock: {{ $product->stock_quantity }}</option>
+                        @endforeach
                     </select>
                     @error('product_id')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -42,7 +45,15 @@
         @if ($cartItems->isEmpty())
             <p>No items in cart.</p>
         @else
-            <form id="confirm-sale-form" action="{{ route('pos.confirm') }}" method="POST">
+            <!-- Clear Cart Button -->
+            <form action="{{ route('pos.clear-cart') }}" method="POST" id="clear-cart-form" class="mb-3">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-warning" onclick="return confirm('Clear all cart items?')">Clear Cart</button>
+            </form>
+
+            <!-- Confirm Sale Form -->
+            <form id="confirm-sale-form" action="/pos/confirm" method="POST">
                 @csrf
                 <div class="mb-3">
                     <label for="customer_id">Customer</label>
@@ -74,11 +85,15 @@
                                 <td>{{ $item->product ? number_format($item->product->price, 2) : 'N/A' }}</td>
                                 <td>{{ $item->product ? number_format($item->product->price * $item->quantity, 2) : 'N/A' }}</td>
                                 <td>
-                                    <form action="{{ route('pos.remove-from-cart', $item->id) }}" method="POST" style="display:inline;">
+                                    <!-- Remove button disabled; use Clear Cart instead -->
+                                    <!--
+                                    <form action="{{ route('pos.remove-from-cart', $item->id) }}" method="POST" class="remove-item-form" style="display:inline;">
                                         @csrf
                                         @method('DELETE')
+                                        <input type="hidden" name="cart_item_id" value="{{ $item->id }}">
                                         <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Remove this item?')">Remove</button>
                                     </form>
+                                    -->
                                 </td>
                             </tr>
                         @endforeach
@@ -91,65 +106,10 @@
         @endif
     </div>
 
-    <link href="{{ asset('vendor/select2/select2.min.css') }}" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="{{ asset('vendor/select2/select2.min.js') }}"></script>
     <script>
-    $(document).ready(function() {
-        $('#product-search').select2({
-            placeholder: 'Select or search for a product',
-            allowClear: true,
-            ajax: {
-                url: '{{ route('pos.search-products') }}',
-                dataType: 'json',
-                delay: 250,
-                data: function(params) {
-                    return {
-                        query: params.term || ''
-                    };
-                },
-                processResults: function(data) {
-                    return {
-                        results: data.map(function(item) {
-                            return {
-                                id: item.id,
-                                text: item.name + ' (' + item.code + ') - Stock: ' + item.stock_quantity
-                            };
-                        })
-                    };
-                },
-                cache: true
-            },
-            minimumInputLength: 0 // Allow dropdown to show all products when clicked without typing
+        document.getElementById('confirm-sale-form').addEventListener('submit', function(e) {
+            console.log('Confirm Sale form submitted to:', this.action);
+            console.log('Form data:', new FormData(this));
         });
-
-        // Preload all products on page load
-        $.ajax({
-            url: '{{ route('pos.search-products') }}',
-            dataType: 'json',
-            success: function(data) {
-                console.log('Loaded products:', data); // Debug: Log loaded products
-                data.forEach(function(item) {
-                    var option = new Option(
-                        item.name + ' (' + item.code + ') - Stock: ' + item.stock_quantity,
-                        item.id,
-                        false,
-                        false
-                    );
-                    $('#product-search').append(option);
-                });
-                $('#product-search').trigger('change'); // Refresh Select2 to show preloaded options
-            },
-            error: function(xhr, status, error) {
-                console.error('Failed to load products:', status, error, xhr.responseText);
-            }
-        });
-
-        // Debug form submission
-        $('#confirm-sale-form').on('submit', function(e) {
-            console.log('Confirm Sale form submitted');
-            console.log('Form data:', $(this).serialize());
-        });
-    });
     </script>
 @endsection
