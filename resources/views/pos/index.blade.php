@@ -3,65 +3,54 @@
 @section('title', 'Point of Sale')
 @section('content')
     <div class="container">
-        <h1>Point of Sale</h1>
-        <a href="{{ route('pos.create') }}" class="btn btn-primary mb-3">Add Sale</a>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1>Point of Sale</h1>
+            <a href="{{ route('pos.create') }}" class="btn btn-primary">Add Sale</a>
+        </div>
         @if (session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
         @if (session('error'))
             <div class="alert alert-danger">{{ session('error') }}</div>
         @endif
-        @if (session('sale_ids'))
+        @if (session('sale_transaction_id'))
             @php
-                $sales = App\Models\Sale::with('product', 'customer')->whereIn('id', session('sale_ids'))->get();
+                $saleTransaction = App\Models\SaleTransaction::with(['sales.product', 'customer'])->find(session('sale_transaction_id'));
             @endphp
-            @if ($sales->isNotEmpty())
-                @include('pos.receipt', ['sales' => $sales])
+            @if ($saleTransaction)
+                @include('pos.receipt', ['saleTransaction' => $saleTransaction])
             @else
-                <div class="alert alert-warning">Sales not found for receipt.</div>
-            @endif
-        @elseif (session('sale_id'))
-            @php
-                $sale = App\Models\Sale::with('product', 'customer')->find(session('sale_id'));
-            @endphp
-            @if ($sale)
-                @include('pos.receipt', ['sales' => [$sale]])
-            @else
-                <div class="alert alert-warning">Sale not found for receipt.</div>
+                <div class="alert alert-warning">Sale transaction not found for receipt.</div>
             @endif
         @endif
         <h3>Recent Sales</h3>
-        @if ($sales->isEmpty())
+        @if ($saleTransactions->isEmpty())
             <p>No sales recorded.</p>
         @else
-            <table class="table">
+            <table class="table table-bordered">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Product</th>
+                        <th>Transaction ID</th>
                         <th>Customer</th>
-                        <th>Quantity</th>
-                        <th>Price</th>
+                        <th>Total Amount</th>
                         <th>Date</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($sales as $sale)
+                    @foreach ($saleTransactions as $saleTransaction)
                         <tr>
-                            <td>{{ $sale->id }}</td>
-                            <td>{{ $sale->product ? $sale->product->name . ' (' . $sale->product->code . ')' : 'N/A' }}</td>
-                            <td>{{ $sale->customer ? $sale->customer->name : 'N/A' }}</td>
-                            <td>{{ $sale->quantity }}</td>
-                            <td>{{ number_format($sale->price, 2) }}</td>
-                            <td>{{ $sale->created_at->format('Y-m-d') }}</td>
+                            <td>{{ $saleTransaction->id }}</td>
+                            <td>{{ $saleTransaction->customer ? $saleTransaction->customer->name : 'N/A' }}</td>
+                            <td>{{ number_format($saleTransaction->total_amount, 2) }}</td>
+                            <td>{{ $saleTransaction->created_at ? $saleTransaction->created_at->format('Y-m-d') : 'N/A' }}</td>
                             <td>
-                                <a href="{{ route('pos.view', $sale) }}" class="btn btn-sm btn-info">View</a>
-                                <a href="{{ route('pos.edit', $sale) }}" class="btn btn-sm btn-primary">Edit</a>
-                                <form action="{{ route('pos.destroy', $sale) }}" method="POST" style="display:inline;">
+                                <a href="{{ route('pos.view', $saleTransaction) }}" class="btn btn-sm btn-info">View</a>
+                                <a href="{{ route('pos.edit', $saleTransaction) }}" class="btn btn-sm btn-primary">Edit</a>
+                                <form action="{{ route('pos.destroy', $saleTransaction) }}" method="POST" style="display:inline;">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this sale?')">Delete</button>
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this sale transaction?')">Delete</button>
                                 </form>
                             </td>
                         </tr>

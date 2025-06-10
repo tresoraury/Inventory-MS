@@ -7,6 +7,7 @@ use App\Models\Operation;
 use App\Models\OperationType;
 use App\Models\Product;
 use App\Models\Sale;
+use App\Models\SaleTransaction;
 use App\Models\CartItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -22,15 +23,21 @@ class POSController extends Controller
 
     public function index()
     {
-        $products = Product::all();
-        $sales = Sale::with('product', 'customer')->latest()->take(10)->get();
-        return view('pos.index', compact('products', 'sales'));
+        // Group sales by sale_transaction_id
+        $saleTransactions = SaleTransaction::with(['sales.product', 'customer'])->latest()->take(10)->get();
+        return view('pos.index', compact('saleTransactions'));
     }
 
-    public function view(Sale $sale)
+    public function view(SaleTransaction $saleTransaction)
     {
-        $sale->load('product', 'customer');
-        return view('pos.view', compact('sale'));
+        if (!$saleTransaction->exists) {
+            Log::error('SaleTransaction not found', ['id' => request()->route('saleTransaction')]);
+            return redirect()->route('pos.index')->with('error', 'Sale transaction not found.');
+        }
+
+        $saleTransaction->load(['sales.product', 'customer']);
+        Log::info('SaleTransaction loaded for view', ['id' => $saleTransaction->id, 'data' => $saleTransaction->toArray()]);
+        return view('pos.view', compact('saleTransaction'));
     }
 
     public function create()
@@ -108,7 +115,6 @@ class POSController extends Controller
             
             if (!$cartItem) {
                 Log::warning('Cart item not found', ['id' => $id, 'session_id' => $sessionId]);
-                // Log all cart items to debug
                 $allCartItems = CartItem::all()->toArray();
                 Log::info('All cart items in database', ['cart_items' => $allCartItems]);
                 return redirect()->route('pos.create')->with('error', 'Cart item not found.');
@@ -140,7 +146,7 @@ class POSController extends Controller
     public function confirmSale(Request $request)
     {
         $sessionId = Session::getId();
-        Log::info('confirmSale method reached', ['session_id' => $sessionId, 'input' => $request->all(), 'method' => $request->method(), 'url' => $request->url()]);
+        Log::info('confirmSale method reached', ['session_id' => $sessionId, 'input' => $request->all()]);
 
         try {
             $request->validate([
@@ -155,7 +161,26 @@ class POSController extends Controller
                 return redirect()->route('pos.create')->with('error', 'Cart is empty.');
             }
 
-            $sales = [];
+            // Calculate total amount for the transaction
+            $totalAmount = 0;
+            foreach ($cartItems as $item) {
+                $totalAmount += $item->product->price * $item->quantity;
+            }
+
+            if ($totalAmount > 99999999.99) {
+                Log::warning('confirmSale: Total transaction amount exceeds max', ['total_amount' => $totalAmount]);
+                return redirect()->route('pos.create')->with('error', 'Total transaction amount exceeds maximum allowed value.');
+            }
+
+            // Create a new SaleTransaction
+            $saleTransaction = SaleTransaction::create([
+                'customer_id' => $request->customer_id,
+                'total_amount' => $totalAmount,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            $saleIds = [];
             $operationType = OperationType::where('name', 'stock-out')->first();
 
             foreach ($cartItems as $item) {
@@ -177,10 +202,10 @@ class POSController extends Controller
                 }
 
                 $sale = Sale::create([
+                    'sale_transaction_id' => $saleTransaction->id,
                     'product_id' => $item->product_id,
                     'quantity' => $item->quantity,
                     'price' => $totalPrice,
-                    'customer_id' => $request->customer_id,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
@@ -199,15 +224,15 @@ class POSController extends Controller
                     Log::warning('confirmSale: OperationType "stock-out" not found', ['sale_id' => $sale->id]);
                 }
 
-                $sales[] = $sale->id;
+                $saleIds[] = $sale->id;
             }
 
             CartItem::where('session_id', $sessionId)->delete();
-            Log::info('confirmSale: Sale confirmed', ['session_id' => $sessionId, 'sale_ids' => $sales]);
+            Log::info('confirmSale: Sale confirmed', ['session_id' => $sessionId, 'sale_transaction_id' => $saleTransaction->id, 'sale_ids' => $saleIds]);
 
             return redirect()->route('pos.index')
                 ->with('success', 'Sale confirmed successfully.')
-                ->with('sale_ids', $sales);
+                ->with('sale_transaction_id', $saleTransaction->id);
         } catch (\Exception $e) {
             Log::error('confirmSale failed', ['session_id' => $sessionId, 'error' => $e->getMessage()]);
             return redirect()->route('pos.create')->with('error', 'Failed to confirm sale: ' . $e->getMessage());
@@ -237,11 +262,19 @@ class POSController extends Controller
                 return redirect()->route('pos.index')->with('error', 'Total price exceeds maximum allowed value.');
             }
 
+            // Create a SaleTransaction for a single product sale
+            $saleTransaction = SaleTransaction::create([
+                'customer_id' => $request->customer_id,
+                'total_amount' => $totalPrice,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
             $sale = Sale::create([
+                'sale_transaction_id' => $saleTransaction->id,
                 'product_id' => $request->product_id,
                 'quantity' => $request->quantity,
                 'price' => $totalPrice,
-                'customer_id' => $request->customer_id,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -263,94 +296,127 @@ class POSController extends Controller
 
             return redirect()->route('pos.index')
                 ->with('success', 'Sale recorded successfully.')
-                ->with('sale_id', $sale->id);
+                ->with('sale_transaction_id', $saleTransaction->id);
         } catch (\Exception $e) {
             Log::error('store failed', ['error' => $e->getMessage()]);
             return redirect()->route('pos.index')
-                ->with('error', 'Failed to record sale: ' . $e->getMessage())
-                ->with('sale_id', isset($sale) ? $sale->id : null);
+                ->with('error', 'Failed to record sale: ' . $e->getMessage());
         }
     }
 
-    public function edit(Sale $sale)
+    public function edit(SaleTransaction $saleTransaction)
     {
+        if (!$saleTransaction->exists) {
+            Log::error('SaleTransaction not found for edit', ['id' => request()->route('saleTransaction')]);
+            return redirect()->route('pos.index')->with('error', 'Sale transaction not found.');
+        }
+
         $products = Product::all();
         $customers = Customer::all();
-        return view('pos.edit', compact('sale', 'products', 'customers'));
+        $saleTransaction->load('sales.product');
+        Log::info('SaleTransaction loaded for edit', ['id' => $saleTransaction->id, 'data' => $saleTransaction->toArray()]);
+        return view('pos.edit', compact('saleTransaction', 'products', 'customers'));
     }
 
-    public function update(Request $request, Sale $sale)
+    public function update(Request $request, SaleTransaction $saleTransaction)
     {
         try {
             $request->validate([
-                'product_id' => 'required|exists:products,id',
-                'quantity' => 'required|integer|min:1',
+                'product_ids' => 'required|array',
+                'product_ids.*' => 'exists:products,id',
+                'quantities' => 'required|array',
+                'quantities.*' => 'integer|min:1',
                 'customer_id' => 'nullable|exists:customers,id',
             ]);
 
-            $product = Product::findOrFail($request->product_id);
-
-            $oldProduct = $sale->product;
-            $oldProduct->stock_quantity += $sale->quantity;
-            $oldProduct->save();
-
-            if ($product->stock_quantity < $request->quantity) {
-                Log::warning('update: Insufficient stock', ['product_id' => $request->product_id, 'requested' => $request->quantity, 'available' => $product->stock_quantity]);
-                return redirect()->route('pos.index')->with('error', 'Insufficient stock for ' . $product->name);
+            // Restore stock for existing sale items
+            foreach ($saleTransaction->sales as $sale) {
+                $product = $sale->product;
+                $product->stock_quantity += $sale->quantity;
+                $product->save();
             }
 
-            $totalPrice = $product->price * $request->quantity;
+            // Delete existing sale items
+            $saleTransaction->sales()->delete();
 
-            if ($totalPrice > 99999999.99) {
-                Log::warning('update: Price exceeds max', ['product_id' => $request->product_id, 'total_price' => $totalPrice]);
-                return redirect()->route('pos.index')->with('error', 'Total price exceeds maximum allowed value.');
+            // Create new sale items
+            $totalAmount = 0;
+            $saleIds = [];
+            $operationType = OperationType::where('name', 'stock-out')->first();
+
+            foreach ($request->product_ids as $index => $product_id) {
+                $product = Product::findOrFail($product_id);
+                $quantity = $request->quantities[$index];
+
+                if ($product->stock_quantity < $quantity) {
+                    Log::warning('update: Insufficient stock', ['product_id' => $product_id, 'requested' => $quantity, 'available' => $product->stock_quantity]);
+                    return redirect()->route('pos.index')->with('error', 'Insufficient stock for ' . $product->name);
+                }
+
+                $totalPrice = $product->price * $quantity;
+                if ($totalPrice > 99999999.99) {
+                    Log::warning('update: Price exceeds max', ['product_id' => $product_id, 'total_price' => $totalPrice]);
+                    return redirect()->route('pos.index')->with('error', 'Total price exceeds maximum for ' . $product->name);
+                }
+
+                $totalAmount += $totalPrice;
+
+                $sale = Sale::create([
+                    'sale_transaction_id' => $saleTransaction->id,
+                    'product_id' => $product_id,
+                    'quantity' => $quantity,
+                    'price' => $totalPrice,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+
+                $product->stock_quantity -= $quantity;
+                $product->save();
+
+                if ($operationType) {
+                    Operation::create([
+                        'product_id' => $product->id,
+                        'operation_type_id' => $operationType->id,
+                        'quantity' => $quantity,
+                        'operation_date' => now(),
+                    ]);
+                }
+
+                $saleIds[] = $sale->id;
             }
 
-            $sale->update([
-                'product_id' => $request->product_id,
-                'quantity' => $request->quantity,
-                'price' => $totalPrice,
+            // Update the sale transaction
+            $saleTransaction->update([
                 'customer_id' => $request->customer_id,
+                'total_amount' => $totalAmount,
                 'updated_at' => now(),
             ]);
 
-            $product->stock_quantity -= $request->quantity;
-            $product->save();
-
-            $operationType = OperationType::where('name', 'stock-out')->first();
-            if ($operationType) {
-                Operation::where('product_id', $sale->product_id)
-                    ->where('operation_type_id', $operationType->id)
-                    ->where('quantity', $sale->quantity)
-                    ->update([
-                        'product_id' => $request->product_id,
-                        'quantity' => $request->quantity,
-                        'operation_date' => now(),
-                    ]);
-            } else {
-                Log::warning('update: OperationType "stock-out" not found', ['sale_id' => $sale->id]);
-            }
-
-            return redirect()->route('pos.index')->with('success', 'Sale updated successfully.');
+            return redirect()->route('pos.index')
+                ->with('success', 'Sale updated successfully.')
+                ->with('sale_transaction_id', $saleTransaction->id);
         } catch (\Exception $e) {
             Log::error('update failed', ['error' => $e->getMessage()]);
             return redirect()->route('pos.index')->with('error', 'Failed to update sale: ' . $e->getMessage());
         }
     }
 
-    public function destroy(Sale $sale)
+    public function destroy(SaleTransaction $saleTransaction)
     {
         try {
-            $product = $sale->product;
-            $product->stock_quantity += $sale->quantity;
-            $product->save();
+            foreach ($saleTransaction->sales as $sale) {
+                $product = $sale->product;
+                $product->stock_quantity += $sale->quantity;
+                $product->save();
+            }
 
-            $sale->delete();
+            $saleTransaction->sales()->delete();
+            $saleTransaction->delete();
 
-            return redirect()->route('pos.index')->with('success', 'Sale deleted successfully.');
+            return redirect()->route('pos.index')->with('success', 'Sale transaction deleted successfully.');
         } catch (\Exception $e) {
             Log::error('destroy failed', ['error' => $e->getMessage()]);
-            return redirect()->route('pos.index')->with('error', 'Failed to delete sale: ' . $e->getMessage());
+            return redirect()->route('pos.index')->with('error', 'Failed to delete sale transaction: ' . $e->getMessage());
         }
     }
 
@@ -358,10 +424,8 @@ class POSController extends Controller
     {
         try {
             $sessionId = Session::getId();
-            // Delete all cart items not matching the current session
             CartItem::where('session_id', '!=', $sessionId)->delete();
             Log::info('Cleared cart items with non-matching session IDs', ['current_session_id' => $sessionId]);
-            // Also clear items older than 24 hours
             $expiredTime = now()->subHours(24);
             CartItem::where('updated_at', '<', $expiredTime)->delete();
             Log::info('Cleared stale cart items older than 24 hours');
