@@ -74,6 +74,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/reports/operations', [ReportController::class, 'operations'])->name('reports.operations')->middleware('permission:view reports');
     Route::get('/reports/sales', [ReportController::class, 'sales'])->name('reports.sales')->middleware('permission:view reports');
     Route::get('/reports/suppliers', [ReportController::class, 'suppliers'])->name('reports.suppliers')->middleware('permission:view reports');
+    Route::get('/reports/purchase-orders', [ReportController::class, 'purchaseOrders'])->name('reports.purchase-orders')->middleware('permission:view reports');
 
     Route::middleware(['permission:manage purchase orders'])->group(function () {
         Route::get('/purchase-orders', [PurchaseOrderController::class, 'index'])->name('purchase_orders.index');

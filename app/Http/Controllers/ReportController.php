@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Operation;
 use App\Models\Product;
+use App\Models\PurchaseOrder;
 use App\Models\Sale;
+use App\Models\SaleTransaction;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
 
@@ -45,16 +47,21 @@ class ReportController extends Controller
 
     public function sales(Request $request)
     {
-        $query = Sale::with('product');
+        $query = SaleTransaction::with(['sales.product', 'customer']);
+        $totalSales = 0;
+
         if ($request->has('start_date') && $request->has('end_date')) {
             $startDate = $request->query('start_date');
             $endDate = $request->query('end_date');
             $query->whereBetween('created_at', [$startDate, $endDate . ' 23:59:59']);
         }
-        $sales = $query->get();
+
+        $saleTransactions = $query->get();
+        $totalSales = $saleTransactions->sum('total_amount');
         $startDate = $request->query('start_date');
         $endDate = $request->query('end_date');
-        return view('admin.reports.sales', compact('sales', 'startDate', 'endDate'));
+
+        return view('admin.reports.sales', compact('saleTransactions', 'totalSales', 'startDate', 'endDate'));
     }
 
     public function suppliers(Request $request)
@@ -76,5 +83,24 @@ class ReportController extends Controller
         }
 
         return view('admin.reports.suppliers', compact('suppliers', 'products', 'selectedSupplier', 'startDate', 'endDate'));
+    }
+
+    public function purchaseOrders(Request $request)
+    {
+        $query = PurchaseOrder::with(['items.product', 'supplier']);
+        $totalPurchaseOrders = 0;
+
+        if ($request->has('start_date') && $request->has('end_date')) {
+            $startDate = $request->query('start_date');
+            $endDate = $request->query('end_date');
+            $query->whereBetween('created_at', [$startDate, $endDate . ' 23:59:59']);
+        }
+
+        $purchaseOrders = $query->get();
+        $totalPurchaseOrders = $purchaseOrders->sum('total_amount');
+        $startDate = $request->query('start_date');
+        $endDate = $request->query('end_date');
+
+        return view('admin.reports.purchase_orders', compact('purchaseOrders', 'totalPurchaseOrders', 'startDate', 'endDate'));
     }
 }
