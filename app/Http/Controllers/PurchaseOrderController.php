@@ -31,19 +31,27 @@ class PurchaseOrderController extends Controller
             'supplier_id' => 'required|exists:suppliers,id',
             'products' => 'required|array',
             'products.*.id' => 'required|exists:products,id',
-            'products.*.quantity' => 'required|integer|min:1'
+            'products.*.quantity' => 'required|integer|min:1',
+            'products.*.unit_cost' => 'required|numeric|min:0'
         ]);
+
+        $totalAmount = 0;
+        foreach ($request->products as $product) {
+            $totalAmount += $product['quantity'] * $product['unit_cost'];
+        }
 
         $purchaseOrder = PurchaseOrder::create([
             'supplier_id' => $request->supplier_id,
-            'status' => 'pending'
+            'status' => 'pending',
+            'total_amount' => $totalAmount
         ]);
 
         foreach ($request->products as $product) {
             PurchaseOrderItem::create([
                 'purchase_order_id' => $purchaseOrder->id,
                 'product_id' => $product['id'],
-                'quantity' => $product['quantity']
+                'quantity' => $product['quantity'],
+                'unit_cost' => $product['unit_cost']
             ]);
         }
 
@@ -77,11 +85,18 @@ class PurchaseOrderController extends Controller
             'supplier_id' => 'required|exists:suppliers,id',
             'products' => 'required|array',
             'products.*.id' => 'required|exists:products,id',
-            'products.*.quantity' => 'required|integer|min:1'
+            'products.*.quantity' => 'required|integer|min:1',
+            'products.*.unit_cost' => 'required|numeric|min:0'
         ]);
+
+        $totalAmount = 0;
+        foreach ($request->products as $product) {
+            $totalAmount += $product['quantity'] * $product['unit_cost'];
+        }
 
         $purchaseOrder->update([
             'supplier_id' => $request->supplier_id,
+            'total_amount' => $totalAmount
         ]);
 
         $purchaseOrder->items()->delete();
@@ -89,7 +104,8 @@ class PurchaseOrderController extends Controller
             PurchaseOrderItem::create([
                 'purchase_order_id' => $purchaseOrder->id,
                 'product_id' => $product['id'],
-                'quantity' => $product['quantity']
+                'quantity' => $product['quantity'],
+                'unit_cost' => $product['unit_cost']
             ]);
         }
 
@@ -98,7 +114,6 @@ class PurchaseOrderController extends Controller
 
     public function destroy(PurchaseOrder $purchaseOrder)
     {
-        // Delete associated items to avoid foreign key constraint
         $purchaseOrder->items()->delete();
         $purchaseOrder->delete();
         return redirect()->route('purchase_orders.index')->with('success', 'Purchase Order deleted.');
@@ -121,8 +136,8 @@ class PurchaseOrderController extends Controller
                 'product_id' => $item->product_id,
                 'operation_type_id' => $operationType->id,
                 'supplier_id' => $purchaseOrder->supplier_id,
-                'quantity' => $item->quantity,
-                'operation_date' => now()
+                'quantity' => $item->quantity, 
+                'operation_date' => now()->toDateString()
             ]);
         }
 

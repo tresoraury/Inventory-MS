@@ -7,6 +7,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link href="{{ asset('css/custom.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/print.css') }}" media="print">
+    <link rel="stylesheet" href="{{ asset('css/reports.css') }}">
     <style>
         body {
             display: flex;
@@ -84,10 +86,10 @@
             body * {
                 visibility: hidden;
             }
-            .receipt-container, .receipt-container * {
+            .printable, .printable * {
                 visibility: visible;
             }
-            .sidebar, .sidebar-toggle, form, .btn, .no-print, .alert, .table:not(.receipt-table) {
+            .sidebar, .sidebar-toggle, form, .btn, .no-print, .alert {
                 display: none !important;
             }
             .content-wrapper {
@@ -101,12 +103,20 @@
             .card-body {
                 padding: 0;
             }
-            h5.card-title {
-                font-size: 18px;
-                margin-bottom: 10px;
+            .print-title {
+                font-size: 24px;
+                margin-bottom: 20px;
             }
-            p {
+            p, td, th {
                 font-size: 14px;
+            }
+            .table {
+                width: 100% !important;
+                border-collapse: collapse !important;
+            }
+            .table th, .table td {
+                border: 1px solid #000 !important;
+                padding: 8px !important;
             }
         }
     </style>

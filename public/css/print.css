@@ -1,0 +1,49 @@
+@media print {
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 10px;
+        color: #000;
+    }
+    .no-print, .sidebar, .navbar, .footer, .breadcrumb, button, form, .card-header {
+        display: none !important;
+    }
+    .printable {
+        border: none !important;
+        box-shadow: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+    }
+    .print-title {
+        font-size: 20px;
+        text-align: center;
+        margin-bottom: 15px;
+    }
+    table.table-report {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+    table.table-report th, table.table-report td {
+        border: 1px solid #000;
+        padding: 6px;
+        text-align: left;
+        font-size: 12px;
+    }
+    table.table-report th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+    }
+    ul {
+        margin: 0;
+        padding-left: 15px;
+        font-size: 12px;
+    }
+    .mt-3 {
+        text-align: right;
+        font-weight: bold;
+        margin-top: 10px;
+        font-size: 12px;
+    }
+}
