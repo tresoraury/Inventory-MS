@@ -37,13 +37,23 @@ class PurchaseOrderController extends Controller
         ]);
 
         $totalAmount = 0;
+        $productsData = [];
+
         foreach ($request->products as $product) {
-            $totalAmount += $product['quantity'] * $product['unit_cost'];
+            $productModel = Product::findOrFail($product['id']);
+            $unitCost = $product['unit_cost'] > 0 ? $product['unit_cost'] : $productModel->price;
+            $totalAmount += $product['quantity'] * $unitCost;
+            $productsData[] = [
+                'id' => $product['id'],
+                'quantity' => $product['quantity'],
+                'unit_cost' => $unitCost,
+                'product_price' => $productModel->price // For logging
+            ];
         }
 
         Log::info('Creating purchase order', [
             'supplier_id' => $request->supplier_id,
-            'products' => $request->products,
+            'products' => $productsData,
             'total_amount' => $totalAmount
         ]);
 
@@ -53,7 +63,7 @@ class PurchaseOrderController extends Controller
             'total_amount' => $totalAmount
         ]);
 
-        foreach ($request->products as $product) {
+        foreach ($productsData as $product) {
             PurchaseOrderItem::create([
                 'purchase_order_id' => $purchaseOrder->id,
                 'product_id' => $product['id'],
@@ -97,14 +107,24 @@ class PurchaseOrderController extends Controller
         ]);
 
         $totalAmount = 0;
+        $productsData = [];
+
         foreach ($request->products as $product) {
-            $totalAmount += $product['quantity'] * $product['unit_cost'];
+            $productModel = Product::findOrFail($product['id']);
+            $unitCost = $product['unit_cost'] > 0 ? $product['unit_cost'] : $productModel->price;
+            $totalAmount += $product['quantity'] * $unitCost;
+            $productsData[] = [
+                'id' => $product['id'],
+                'quantity' => $product['quantity'],
+                'unit_cost' => $unitCost,
+                'product_price' => $productModel->price // For logging
+            ];
         }
 
         Log::info('Updating purchase order', [
             'purchase_order_id' => $purchaseOrder->id,
             'supplier_id' => $request->supplier_id,
-            'products' => $request->products,
+            'products' => $productsData,
             'total_amount' => $totalAmount
         ]);
 
@@ -114,7 +134,7 @@ class PurchaseOrderController extends Controller
         ]);
 
         $purchaseOrder->items()->delete();
-        foreach ($request->products as $product) {
+        foreach ($productsData as $product) {
             PurchaseOrderItem::create([
                 'purchase_order_id' => $purchaseOrder->id,
                 'product_id' => $product['id'],
@@ -150,7 +170,7 @@ class PurchaseOrderController extends Controller
                 'product_id' => $item->product_id,
                 'operation_type_id' => $operationType->id,
                 'supplier_id' => $purchaseOrder->supplier_id,
-                'quantity' => $item->quantity, 
+                'quantity' => $item->quantity,
                 'operation_date' => now()->toDateString()
             ]);
         }

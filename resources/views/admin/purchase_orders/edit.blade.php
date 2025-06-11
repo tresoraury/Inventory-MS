@@ -44,7 +44,7 @@
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label">Unit Cost</label>
-                                <input type="number" name="products[{{ $index }}][unit_cost]" class="form-control unit-cost" value="{{ $item->unit_cost }}" min="0" step="0.01" required>
+                                <input type="number" name="products[{{ $index }}][unit_cost]" class="form-control unit-cost" value="{{ $item->unit_cost > 0 ? $item->unit_cost : '' }}" min="0" step="0.01" required>
                             </div>
                             <div class="col-md-2">
                                 <button type="button" class="btn btn-danger remove-product mt-4">Remove</button>
@@ -75,14 +75,24 @@
         document.getElementById('total_amount').value = total.toFixed(2);
     }
 
-    function initializeProductRow(row) {
+    function setUnitCost(row) {
         const select = row.querySelector('.product-select');
         const unitCostInput = row.querySelector('.unit-cost');
         const selectedOption = select.selectedOptions[0];
-        if (selectedOption && unitCostInput.value == 0) {
+        if (selectedOption && (!unitCostInput.value || parseFloat(unitCostInput.value) === 0)) {
             unitCostInput.value = parseFloat(selectedOption.dataset.unitCost || 0).toFixed(2);
+            unitCostInput.dispatchEvent(new Event('input')); // Trigger input event
         }
         updateTotalAmount();
+    }
+
+    function initializeProductRows() {
+        document.querySelectorAll('.product-row').forEach(row => {
+            const select = row.querySelector('.product-select');
+            if (select.value) {
+                setUnitCost(row);
+            }
+        });
     }
 
     document.getElementById('add-product').addEventListener('click', function() {
@@ -114,10 +124,7 @@
         container.appendChild(row);
 
         row.querySelector('.product-select').addEventListener('change', function() {
-            const selectedOption = this.selectedOptions[0];
-            const unitCost = selectedOption.dataset.unitCost || 0;
-            row.querySelector('.unit-cost').value = parseFloat(unitCost).toFixed(2);
-            updateTotalAmount();
+            setUnitCost(row);
         });
 
         row.querySelector('.quantity').addEventListener('input', updateTotalAmount);
@@ -136,10 +143,7 @@
     document.querySelectorAll('.product-select').forEach(select => {
         select.addEventListener('change', function() {
             const row = this.closest('.product-row');
-            const selectedOption = this.selectedOptions[0];
-            const unitCost = selectedOption.dataset.unitCost || 0;
-            row.querySelector('.unit-cost').value = parseFloat(unitCost).toFixed(2);
-            updateTotalAmount();
+            setUnitCost(row);
         });
     });
 
@@ -147,6 +151,16 @@
         input.addEventListener('input', updateTotalAmount);
     });
 
-    document.querySelectorAll('.product-row').forEach(row => initializeProductRow(row));
+    // Initialize unit costs on page load
+    initializeProductRows();
+
+    // Ensure unit costs are set before form submission
+    document.querySelector('form').addEventListener('submit', function(e) {
+        document.querySelectorAll('.product-row').forEach(row => {
+            if (row.querySelector('.product-select').value) {
+                setUnitCost(row);
+            }
+        });
+    });
 </script>
 @endsection
