@@ -46,15 +46,16 @@ class PurchaseOrderController extends Controller
             $productsData[] = [
                 'id' => $product['id'],
                 'quantity' => $product['quantity'],
-                'unit_cost' => $unitCost,
-                'product_price' => $productModel->price // For logging
+                'unit_cost' => $unitCost, 
+                'product_price' => $productModel->price 
             ];
         }
 
         Log::info('Creating purchase order', [
             'supplier_id' => $request->supplier_id,
             'products' => $productsData,
-            'total_amount' => $totalAmount
+            'total_amount' => $totalAmount,
+            'raw_products' => $request->products 
         ]);
 
         $purchaseOrder = PurchaseOrder::create([
@@ -68,7 +69,7 @@ class PurchaseOrderController extends Controller
                 'purchase_order_id' => $purchaseOrder->id,
                 'product_id' => $product['id'],
                 'quantity' => $product['quantity'],
-                'unit_cost' => $product['unit_cost']
+                'unit_cost' => $product['unit_cost'] 
             ]);
         }
 
@@ -116,8 +117,8 @@ class PurchaseOrderController extends Controller
             $productsData[] = [
                 'id' => $product['id'],
                 'quantity' => $product['quantity'],
-                'unit_cost' => $unitCost,
-                'product_price' => $productModel->price // For logging
+                'unit_cost' => $unitCost, 
+                'product_price' => $productModel->price 
             ];
         }
 
@@ -125,7 +126,8 @@ class PurchaseOrderController extends Controller
             'purchase_order_id' => $purchaseOrder->id,
             'supplier_id' => $request->supplier_id,
             'products' => $productsData,
-            'total_amount' => $totalAmount
+            'total_amount' => $totalAmount,
+            'raw_products' => $request->products 
         ]);
 
         $purchaseOrder->update([
@@ -139,7 +141,7 @@ class PurchaseOrderController extends Controller
                 'purchase_order_id' => $purchaseOrder->id,
                 'product_id' => $product['id'],
                 'quantity' => $product['quantity'],
-                'unit_cost' => $product['unit_cost']
+                'unit_cost' => $product['unit_cost'] 
             ]);
         }
 

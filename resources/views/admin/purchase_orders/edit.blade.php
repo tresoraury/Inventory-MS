@@ -14,7 +14,7 @@
             Edit Purchase Order Details
         </div>
         <div class="card-body">
-            <form action="{{ route('purchase_orders.update', $purchaseOrder) }}" method="POST">
+            <form action="{{ route('purchase_orders.update', $purchaseOrder) }}" method="POST" id="purchase-order-form">
                 @csrf
                 @method('PUT')
                 <div class="mb-3">
@@ -80,8 +80,10 @@
         const unitCostInput = row.querySelector('.unit-cost');
         const selectedOption = select.selectedOptions[0];
         if (selectedOption && (!unitCostInput.value || parseFloat(unitCostInput.value) === 0)) {
-            unitCostInput.value = parseFloat(selectedOption.dataset.unitCost || 0).toFixed(2);
-            unitCostInput.dispatchEvent(new Event('input')); // Trigger input event
+            const unitCost = parseFloat(selectedOption.dataset.unitCost || 0).toFixed(2);
+            unitCostInput.value = unitCost;
+            unitCostInput.dispatchEvent(new Event('input')); 
+            console.log(`Set unit cost for product ${select.value}: ${unitCost}`); 
         }
         updateTotalAmount();
     }
@@ -151,16 +153,21 @@
         input.addEventListener('input', updateTotalAmount);
     });
 
-    // Initialize unit costs on page load
+    
     initializeProductRows();
 
-    // Ensure unit costs are set before form submission
-    document.querySelector('form').addEventListener('submit', function(e) {
+    
+    document.getElementById('purchase-order-form').addEventListener('submit', function(e) {
+        e.preventDefault(); 
         document.querySelectorAll('.product-row').forEach(row => {
-            if (row.querySelector('.product-select').value) {
+            const select = row.querySelector('.product-select');
+            if (select.value) {
                 setUnitCost(row);
             }
         });
+        const formData = new FormData(this);
+        console.log('Form data:', Object.fromEntries(formData)); 
+        setTimeout(() => this.submit(), 100); 
     });
 </script>
 @endsection
