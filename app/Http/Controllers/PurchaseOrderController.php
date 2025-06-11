@@ -9,6 +9,7 @@ use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class PurchaseOrderController extends Controller
 {
@@ -39,6 +40,12 @@ class PurchaseOrderController extends Controller
         foreach ($request->products as $product) {
             $totalAmount += $product['quantity'] * $product['unit_cost'];
         }
+
+        Log::info('Creating purchase order', [
+            'supplier_id' => $request->supplier_id,
+            'products' => $request->products,
+            'total_amount' => $totalAmount
+        ]);
 
         $purchaseOrder = PurchaseOrder::create([
             'supplier_id' => $request->supplier_id,
@@ -93,6 +100,13 @@ class PurchaseOrderController extends Controller
         foreach ($request->products as $product) {
             $totalAmount += $product['quantity'] * $product['unit_cost'];
         }
+
+        Log::info('Updating purchase order', [
+            'purchase_order_id' => $purchaseOrder->id,
+            'supplier_id' => $request->supplier_id,
+            'products' => $request->products,
+            'total_amount' => $totalAmount
+        ]);
 
         $purchaseOrder->update([
             'supplier_id' => $request->supplier_id,

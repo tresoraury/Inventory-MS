@@ -44,7 +44,7 @@
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label">Unit Cost</label>
-                                <input type="number" name="products[{{ $index }}][unit_cost]" class="form-control unit-cost" value="{{ number_format($item->unit_cost, 2) }}" min="0" step="0.01" required>
+                                <input type="number" name="products[{{ $index }}][unit_cost]" class="form-control unit-cost" value="{{ $item->unit_cost }}" min="0" step="0.01" required>
                             </div>
                             <div class="col-md-2">
                                 <button type="button" class="btn btn-danger remove-product mt-4">Remove</button>
@@ -73,6 +73,16 @@
             total += quantity * unitCost;
         });
         document.getElementById('total_amount').value = total.toFixed(2);
+    }
+
+    function initializeProductRow(row) {
+        const select = row.querySelector('.product-select');
+        const unitCostInput = row.querySelector('.unit-cost');
+        const selectedOption = select.selectedOptions[0];
+        if (selectedOption && unitCostInput.value == 0) {
+            unitCostInput.value = parseFloat(selectedOption.dataset.unitCost || 0).toFixed(2);
+        }
+        updateTotalAmount();
     }
 
     document.getElementById('add-product').addEventListener('click', function() {
@@ -137,6 +147,6 @@
         input.addEventListener('input', updateTotalAmount);
     });
 
-    updateTotalAmount();
+    document.querySelectorAll('.product-row').forEach(row => initializeProductRow(row));
 </script>
 @endsection

@@ -3,10 +3,15 @@
 @section('content')
 <div class="container-fluid">
     <h1 class="mt-4">Create Purchase Order</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{{ route('purchase_orders.index') }}">Purchase Orders</a></li>
+        <li class="breadcrumb-item active">Create</li>
+    </ol>
     <div class="card mb-4">
         <div class="card-header">
             <i class="fas fa-file-invoice mr-1"></i>
-            New Purchase Order
+            Create Purchase Order
         </div>
         <div class="card-body">
             <form action="{{ route('purchase_orders.store') }}" method="POST">
@@ -67,6 +72,15 @@
         document.getElementById('total_amount').value = total.toFixed(2);
     }
 
+    function initializeProductRow(row) {
+        const select = row.querySelector('.product-select');
+        const selectedOption = select.selectedOptions[0];
+        if (selectedOption && selectedOption.dataset.unitCost) {
+            row.querySelector('.unit-cost').value = parseFloat(selectedOption.dataset.unitCost).toFixed(2);
+        }
+        updateTotalAmount();
+    }
+
     document.getElementById('add-product').addEventListener('click', function() {
         const container = document.getElementById('products');
         const row = document.createElement('div');
@@ -95,7 +109,6 @@
         `;
         container.appendChild(row);
 
-        // Auto-fill unit_cost from selected product
         row.querySelector('.product-select').addEventListener('change', function() {
             const selectedOption = this.selectedOptions[0];
             const unitCost = selectedOption.dataset.unitCost || 0;
@@ -103,7 +116,6 @@
             updateTotalAmount();
         });
 
-        // Update total on quantity or unit cost change
         row.querySelector('.quantity').addEventListener('input', updateTotalAmount);
         row.querySelector('.unit-cost').addEventListener('input', updateTotalAmount);
 
@@ -117,7 +129,6 @@
         }
     });
 
-    // Initialize unit cost and total amount for the first row
     document.querySelectorAll('.product-select').forEach(select => {
         select.addEventListener('change', function() {
             const row = this.closest('.product-row');
@@ -132,7 +143,6 @@
         input.addEventListener('input', updateTotalAmount);
     });
 
-    // Initial total calculation
-    updateTotalAmount();
+    document.querySelectorAll('.product-row').forEach(row => initializeProductRow(row));
 </script>
 @endsection
