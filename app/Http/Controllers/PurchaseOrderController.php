@@ -33,7 +33,7 @@ class PurchaseOrderController extends Controller
             'products' => 'required|array',
             'products.*.id' => 'required|exists:products,id',
             'products.*.quantity' => 'required|integer|min:1',
-            'products.*.unit_cost' => 'required|numeric|min:0'
+            'products.*.unit_cost' => 'nullable|numeric|min:0' // Allow null
         ]);
 
         $totalAmount = 0;
@@ -41,13 +41,13 @@ class PurchaseOrderController extends Controller
 
         foreach ($request->products as $product) {
             $productModel = Product::findOrFail($product['id']);
-            $unitCost = $product['unit_cost'] > 0 ? $product['unit_cost'] : $productModel->price;
+            $unitCost = !empty($product['unit_cost']) && $product['unit_cost'] > 0 ? $product['unit_cost'] : $productModel->price;
             $totalAmount += $product['quantity'] * $unitCost;
             $productsData[] = [
                 'id' => $product['id'],
                 'quantity' => $product['quantity'],
-                'unit_cost' => $unitCost, 
-                'product_price' => $productModel->price 
+                'unit_cost' => $unitCost,
+                'product_price' => $productModel->price
             ];
         }
 
@@ -55,7 +55,7 @@ class PurchaseOrderController extends Controller
             'supplier_id' => $request->supplier_id,
             'products' => $productsData,
             'total_amount' => $totalAmount,
-            'raw_products' => $request->products 
+            'raw_products' => $request->products
         ]);
 
         $purchaseOrder = PurchaseOrder::create([
@@ -69,7 +69,7 @@ class PurchaseOrderController extends Controller
                 'purchase_order_id' => $purchaseOrder->id,
                 'product_id' => $product['id'],
                 'quantity' => $product['quantity'],
-                'unit_cost' => $product['unit_cost'] 
+                'unit_cost' => $product['unit_cost'] // Use computed unit_cost
             ]);
         }
 
@@ -104,7 +104,7 @@ class PurchaseOrderController extends Controller
             'products' => 'required|array',
             'products.*.id' => 'required|exists:products,id',
             'products.*.quantity' => 'required|integer|min:1',
-            'products.*.unit_cost' => 'required|numeric|min:0'
+            'products.*.unit_cost' => 'nullable|numeric|min:0' // Allow null
         ]);
 
         $totalAmount = 0;
@@ -112,13 +112,13 @@ class PurchaseOrderController extends Controller
 
         foreach ($request->products as $product) {
             $productModel = Product::findOrFail($product['id']);
-            $unitCost = $product['unit_cost'] > 0 ? $product['unit_cost'] : $productModel->price;
+            $unitCost = !empty($product['unit_cost']) && $product['unit_cost'] > 0 ? $product['unit_cost'] : $productModel->price;
             $totalAmount += $product['quantity'] * $unitCost;
             $productsData[] = [
                 'id' => $product['id'],
                 'quantity' => $product['quantity'],
-                'unit_cost' => $unitCost, 
-                'product_price' => $productModel->price 
+                'unit_cost' => $unitCost,
+                'product_price' => $productModel->price
             ];
         }
 
@@ -127,7 +127,7 @@ class PurchaseOrderController extends Controller
             'supplier_id' => $request->supplier_id,
             'products' => $productsData,
             'total_amount' => $totalAmount,
-            'raw_products' => $request->products 
+            'raw_products' => $request->products
         ]);
 
         $purchaseOrder->update([
@@ -141,7 +141,7 @@ class PurchaseOrderController extends Controller
                 'purchase_order_id' => $purchaseOrder->id,
                 'product_id' => $product['id'],
                 'quantity' => $product['quantity'],
-                'unit_cost' => $product['unit_cost'] 
+                'unit_cost' => $product['unit_cost'] // Use computed unit_cost
             ]);
         }
 

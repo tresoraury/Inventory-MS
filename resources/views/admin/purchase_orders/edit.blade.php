@@ -44,7 +44,8 @@
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label">Unit Cost</label>
-                                <input type="number" name="products[{{ $index }}][unit_cost]" class="form-control unit-cost" value="{{ $item->unit_cost > 0 ? $item->unit_cost : '' }}" min="0" step="0.01" required>
+                                <input type="number" class="form-control unit-cost" value="{{ $item->unit_cost > 0 ? $item->unit_cost : '' }}" min="0" step="0.01" readonly>
+                                <input type="hidden" name="products[{{ $index }}][unit_cost]" value="{{ $item->unit_cost > 0 ? $item->unit_cost : '0' }}">
                             </div>
                             <div class="col-md-2">
                                 <button type="button" class="btn btn-danger remove-product mt-4">Remove</button>
@@ -78,23 +79,15 @@
     function setUnitCost(row) {
         const select = row.querySelector('.product-select');
         const unitCostInput = row.querySelector('.unit-cost');
+        const hiddenInput = row.querySelector('input[name$="[unit_cost]"]');
         const selectedOption = select.selectedOptions[0];
-        if (selectedOption && (!unitCostInput.value || parseFloat(unitCostInput.value) === 0)) {
-            const unitCost = parseFloat(selectedOption.dataset.unitCost || 0).toFixed(2);
+        if (selectedOption && selectedOption.dataset.unitCost) {
+            const unitCost = parseFloat(selectedOption.dataset.unitCost).toFixed(2);
             unitCostInput.value = unitCost;
-            unitCostInput.dispatchEvent(new Event('input')); 
-            console.log(`Set unit cost for product ${select.value}: ${unitCost}`); 
+            hiddenInput.value = unitCost; // Update hidden input
+            console.log(`Set unit cost for product ${select.value}: ${unitCost}`); // Debug
         }
         updateTotalAmount();
-    }
-
-    function initializeProductRows() {
-        document.querySelectorAll('.product-row').forEach(row => {
-            const select = row.querySelector('.product-select');
-            if (select.value) {
-                setUnitCost(row);
-            }
-        });
     }
 
     document.getElementById('add-product').addEventListener('click', function() {
@@ -117,7 +110,8 @@
             </div>
             <div class="col-md-3">
                 <label class="form-label">Unit Cost</label>
-                <input type="number" name="products[${productIndex}][unit_cost]" class="form-control unit-cost" min="0" step="0.01" required>
+                <input type="number" class="form-control unit-cost" value="0.00" min="0" step="0.01" readonly>
+                <input type="hidden" name="products[${productIndex}][unit_cost]" value="0">
             </div>
             <div class="col-md-2">
                 <button type="button" class="btn btn-danger remove-product mt-4">Remove</button>
@@ -130,7 +124,6 @@
         });
 
         row.querySelector('.quantity').addEventListener('input', updateTotalAmount);
-        row.querySelector('.unit-cost').addEventListener('input', updateTotalAmount);
 
         productIndex++;
     });
@@ -149,25 +142,28 @@
         });
     });
 
-    document.querySelectorAll('.quantity, .unit-cost').forEach(input => {
+    document.querySelectorAll('.quantity').forEach(input => {
         input.addEventListener('input', updateTotalAmount);
     });
 
-    
-    initializeProductRows();
+    // Initialize unit costs on page load
+    document.querySelectorAll('.product-row').forEach(row => {
+        if (row.querySelector('.product-select').value) {
+            setUnitCost(row);
+        }
+    });
 
-    
+    // Debug form submission
     document.getElementById('purchase-order-form').addEventListener('submit', function(e) {
-        e.preventDefault(); 
+        e.preventDefault(); // Debug
         document.querySelectorAll('.product-row').forEach(row => {
-            const select = row.querySelector('.product-select');
-            if (select.value) {
+            if (row.querySelector('.product-select').value) {
                 setUnitCost(row);
             }
         });
         const formData = new FormData(this);
-        console.log('Form data:', Object.fromEntries(formData)); 
-        setTimeout(() => this.submit(), 100); 
+        console.log('Form data:', Object.fromEntries(formData)); // Debug
+        setTimeout(() => this.submit(), 100); // Delay submission
     });
 </script>
 @endsection
