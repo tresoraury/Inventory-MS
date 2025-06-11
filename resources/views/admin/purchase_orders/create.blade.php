@@ -43,7 +43,7 @@
                         <div class="col-md-3">
                             <label class="form-label">Unit Cost</label>
                             <input type="number" class="form-control unit-cost" value="0.00" min="0" step="0.01" readonly>
-                            <input type="hidden" name="products[0][unit_cost]" value="0">
+                            <input type="hidden" name="products[0][unit_cost]" class="hidden-unit-cost" value="0">
                         </div>
                         <div class="col-md-2">
                             <button type="button" class="btn btn-danger remove-product mt-4">Remove</button>
@@ -67,7 +67,7 @@
         let total = 0;
         document.querySelectorAll('.product-row').forEach(row => {
             const quantity = parseFloat(row.querySelector('.quantity').value) || 0;
-            const unitCost = parseFloat(row.querySelector('.unit-cost').value) || 0;
+            const unitCost = parseFloat(row.querySelector('.hidden-unit-cost').value) || 0;
             total += quantity * unitCost;
         });
         document.getElementById('total_amount').value = total.toFixed(2);
@@ -76,13 +76,15 @@
     function setUnitCost(row) {
         const select = row.querySelector('.product-select');
         const unitCostInput = row.querySelector('.unit-cost');
-        const hiddenInput = row.querySelector('input[name$="[unit_cost]"]');
+        const hiddenInput = row.querySelector('.hidden-unit-cost');
         const selectedOption = select.selectedOptions[0];
         if (selectedOption && selectedOption.dataset.unitCost) {
             const unitCost = parseFloat(selectedOption.dataset.unitCost).toFixed(2);
             unitCostInput.value = unitCost;
-            hiddenInput.value = unitCost; // Update hidden input
-            console.log(`Set unit cost for product ${select.value}: ${unitCost}`); // Debug
+            hiddenInput.value = unitCost;
+        } else {
+            unitCostInput.value = '0.00';
+            hiddenInput.value = '0';
         }
         updateTotalAmount();
     }
@@ -108,7 +110,7 @@
             <div class="col-md-3">
                 <label class="form-label">Unit Cost</label>
                 <input type="number" class="form-control unit-cost" value="0.00" min="0" step="0.01" readonly>
-                <input type="hidden" name="products[${productIndex}][unit_cost]" value="0">
+                <input type="hidden" name="products[${productIndex}][unit_cost]" class="hidden-unit-cost" value="0">
             </div>
             <div class="col-md-2">
                 <button type="button" class="btn btn-danger remove-product mt-4">Remove</button>
@@ -143,17 +145,13 @@
         input.addEventListener('input', updateTotalAmount);
     });
 
-    // Ensure unit costs are set before form submission
     document.getElementById('purchase-order-form').addEventListener('submit', function(e) {
-        e.preventDefault(); // Debug
         document.querySelectorAll('.product-row').forEach(row => {
             if (row.querySelector('.product-select').value) {
                 setUnitCost(row);
             }
         });
-        const formData = new FormData(this);
-        console.log('Form data:', Object.fromEntries(formData)); // Debug
-        setTimeout(() => this.submit(), 100); // Delay submission
+        this.submit();
     });
 </script>
 @endsection

@@ -33,7 +33,7 @@ class PurchaseOrderController extends Controller
             'products' => 'required|array',
             'products.*.id' => 'required|exists:products,id',
             'products.*.quantity' => 'required|integer|min:1',
-            'products.*.unit_cost' => 'nullable|numeric|min:0' // Allow null
+            'products.*.unit_cost' => 'nullable|numeric|min:0'
         ]);
 
         $totalAmount = 0;
@@ -41,7 +41,7 @@ class PurchaseOrderController extends Controller
 
         foreach ($request->products as $product) {
             $productModel = Product::findOrFail($product['id']);
-            $unitCost = !empty($product['unit_cost']) && $product['unit_cost'] > 0 ? $product['unit_cost'] : $productModel->price;
+            $unitCost = (isset($product['unit_cost']) && $product['unit_cost'] > 0) ? $product['unit_cost'] : $productModel->price;
             $totalAmount += $product['quantity'] * $unitCost;
             $productsData[] = [
                 'id' => $product['id'],
@@ -69,7 +69,7 @@ class PurchaseOrderController extends Controller
                 'purchase_order_id' => $purchaseOrder->id,
                 'product_id' => $product['id'],
                 'quantity' => $product['quantity'],
-                'unit_cost' => $product['unit_cost'] // Use computed unit_cost
+                'unit_cost' => $product['unit_cost']
             ]);
         }
 
@@ -104,7 +104,7 @@ class PurchaseOrderController extends Controller
             'products' => 'required|array',
             'products.*.id' => 'required|exists:products,id',
             'products.*.quantity' => 'required|integer|min:1',
-            'products.*.unit_cost' => 'nullable|numeric|min:0' // Allow null
+            'products.*.unit_cost' => 'nullable|numeric|min:0'
         ]);
 
         $totalAmount = 0;
@@ -112,7 +112,7 @@ class PurchaseOrderController extends Controller
 
         foreach ($request->products as $product) {
             $productModel = Product::findOrFail($product['id']);
-            $unitCost = !empty($product['unit_cost']) && $product['unit_cost'] > 0 ? $product['unit_cost'] : $productModel->price;
+            $unitCost = (isset($product['unit_cost']) && $product['unit_cost'] > 0) ? $product['unit_cost'] : $productModel->price;
             $totalAmount += $product['quantity'] * $unitCost;
             $productsData[] = [
                 'id' => $product['id'],
@@ -141,7 +141,7 @@ class PurchaseOrderController extends Controller
                 'purchase_order_id' => $purchaseOrder->id,
                 'product_id' => $product['id'],
                 'quantity' => $product['quantity'],
-                'unit_cost' => $product['unit_cost'] // Use computed unit_cost
+                'unit_cost' => $product['unit_cost']
             ]);
         }
 
