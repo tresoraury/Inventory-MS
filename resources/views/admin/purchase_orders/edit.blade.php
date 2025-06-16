@@ -3,11 +3,6 @@
 @section('content')
 <div class="container-fluid">
     <h1 class="mt-4">Edit Purchase Order #{{ $purchaseOrder->id }}</h1>
-    <ol class="breadcrumb mb-4">
-        <li class="breadcrumb-item"><a href="{{ route('home') }}">Dashboard</a></li>
-        <li class="breadcrumb-item"><a href="{{ route('purchase_orders.index') }}">Purchase Orders</a></li>
-        <li class="breadcrumb-item active">Edit</li>
-    </ol>
     <div class="card mb-4">
         <div class="card-header">
             <i class="fas fa-file-invoice mr-1"></i>

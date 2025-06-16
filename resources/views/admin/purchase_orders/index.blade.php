@@ -4,10 +4,12 @@
 <div class="container-fluid">
     <h1 class="mt-4">Purchase Orders</h1>
     <div class="card mb-4">
-        <div class="card-header">
-            <i class="fas fa-file-invoice mr-1"></i>
-            Purchase Orders List
-            <a href="{{ route('purchase_orders.create') }}" class="btn btn-primary float-right">Create Purchase Order</a>
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <div>
+                <i class="fas fa-file-invoice mr-1"></i>
+                Purchase Orders List
+            </div>
+            <a href="{{ route('purchase_orders.create') }}" class="btn btn-primary">Create Purchase Order</a>
         </div>
         <div class="card-body">
             @if ($purchaseOrders->isEmpty())
