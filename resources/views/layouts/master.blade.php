@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -127,96 +127,103 @@
     </button>
 
     <div class="sidebar no-print">
-        <a class="sidebar-brand" href="{{ route('dashboard') }}">Inventory MS</a>
+        <a class="sidebar-brand" href="{{ route('dashboard') }}">{{ auth()->user()->company_name ?? 'Inventory MS' }}</a>
         <ul class="nav flex-column">
             @can('view dashboard')
                 <li class="nav-item">
                     <a class="nav-link {{ Route::is('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">
-                        <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                        <i class="fas fa-tachometer-alt me-2"></i> {{ __('messages.dashboard') }}
                     </a>
                 </li>
             @endcan
             @can('manage products')
                 <li class="nav-item">
                     <a class="nav-link {{ Route::is('products.*') ? 'active' : '' }}" href="{{ route('products.index') }}">
-                        <i class="fas fa-box me-2"></i> Products
+                        <i class="fas fa-box me-2"></i> {{ __('messages.products') }}
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {{ Route::is('categories.*') ? 'active' : '' }}" href="{{ route('categories.index') }}">
-                        <i class="fas fa-list me-2"></i> Categories
+                        <i class="fas fa-list me-2"></i> {{ __('messages.categories') }}
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {{ Route::is('suppliers.*') ? 'active' : '' }}" href="{{ route('suppliers.index') }}">
-                        <i class="fas fa-truck me-2"></i> Suppliers
+                        <i class="fas fa-truck me-2"></i> {{ __('messages.suppliers') }}
                     </a>
                 </li>
             @endcan
             @can('manage operation types')
                 <li class="nav-item">
                     <a class="nav-link {{ Route::is('operation_types.*') ? 'active' : '' }}" href="{{ route('operation_types.index') }}">
-                        <i class="fas fa-cogs me-2"></i> Operation Types
+                        <i class="fas fa-cogs me-2"></i> {{ __('messages.operation_types') }}
                     </a>
                 </li>
             @endcan
             @can('manage stock')
                 <li class="nav-item">
                     <a class="nav-link {{ Route::is('operations.*') ? 'active' : '' }}" href="{{ route('operations.index') }}">
-                        <i class="fas fa-exchange-alt me-2"></i> Operations
+                        <i class="fas fa-exchange-alt me-2"></i> {{ __('messages.operations') }}
                     </a>
                 </li>
             @endcan
             @can('manage sales')
                 <li class="nav-item">
                     <a class="nav-link {{ Route::is('pos.*') ? 'active' : '' }}" href="{{ route('pos.index') }}">
-                        <i class="fas fa-cash-register me-2"></i> POS
+                        <i class="fas fa-cash-register me-2"></i> {{ __('messages.sales') }}
                     </a>
                 </li>
             @endcan
             @can('manage customers')
                 <li class="nav-item">
                     <a class="nav-link {{ Route::is('customers.*') ? 'active' : '' }}" href="{{ route('customers.index') }}">
-                        <i class="fas fa-users me-2"></i> Customers
+                        <i class="fas fa-users me-2"></i> {{ __('messages.customers') }}
                     </a>
                 </li>
             @endcan
             @can('manage products')
                 <li class="nav-item">
                     <a class="nav-link {{ Route::is('low_stock') ? 'active' : '' }}" href="{{ route('low_stock') }}">
-                        <i class="fas fa-exclamation-triangle me-2"></i> Low Stock
+                        <i class="fas fa-exclamation-triangle me-2"></i> {{ __('messages.low_stock') }}
                     </a>
                 </li>
             @endcan
             @can('manage purchase orders')
                 <li class="nav-item">
                     <a class="nav-link {{ Route::is('purchase_orders.*') ? 'active' : '' }}" href="{{ route('purchase_orders.index') }}">
-                        <i class="fas fa-shopping-cart me-2"></i> Purchase Orders
+                        <i class="fas fa-shopping-cart me-2"></i> {{ __('messages.purchase_orders') }}
                     </a>
                 </li>
             @endcan
             @can('manage users')
                 <li class="nav-item">
                     <a class="nav-link {{ Route::is('roles.*') ? 'active' : '' }}" href="{{ route('roles.index') }}">
-                        <i class="fas fa-user-shield me-2"></i> Roles
+                        <i class="fas fa-user-shield me-2"></i> {{ __('messages.roles') }}
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {{ Route::is('role.*') ? 'active' : '' }}" href="{{ route('role.register') }}">
-                        <i class="fas fa-user me-2"></i> Users
+                        <i class="fas fa-user me-2"></i> {{ __('messages.users') }}
                     </a>
                 </li>
             @endcan
             @can('view reports')
                 <li class="nav-item">
                     <a class="nav-link {{ Route::is('reports.*') ? 'active' : '' }}" href="{{ route('reports.index') }}">
-                        <i class="fas fa-chart-bar me-2"></i> Reports
+                        <i class="fas fa-chart-bar me-2"></i> {{ __('messages.reports') }}
+                    </a>
+                </li>
+            @endcan
+            @can('manage settings')
+                <li class="nav-item">
+                    <a class="nav-link {{ Route::is('settings.*') ? 'active' : '' }}" href="{{ route('settings.index') }}">
+                        <i class="fas fa-cog me-2"></i> {{ __('messages.settings') }}
                     </a>
                 </li>
             @endcan
             <li class="nav-item">
                 <a class="nav-link" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                    <i class="fas fa-sign-out-alt me-2"></i> Logout
+                    <i class="fas fa-sign-out-alt me-2"></i> {{ __('messages.logout') }}
                 </a>
                 <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                     @csrf

@@ -4,7 +4,10 @@
         <div class="container">
             <div class="receipt-container">
                 <div class="receipt-header">
-                    <h3>Inventory MS - Sale Receipt</h3>
+                    <h3>{{ auth()->user()->company_name ?? 'Inventory MS' }} - Sale Receipt</h3>
+                    @if (auth()->user()->nif)
+                        <p><strong>NIF:</strong> {{ auth()->user()->nif }}</p>
+                    @endif
                 </div>
                 <p><strong>Date:</strong> {{ $saleTransaction->created_at ? $saleTransaction->created_at->format('Y-m-d H:i:s') : 'N/A' }}</p>
                 <table class="table table-bordered receipt-table">
@@ -21,7 +24,7 @@
                             <tr>
                                 <td>{{ $sale->product ? $sale->product->name . ' (' . $sale->product->code . ')' : 'N/A' }}</td>
                                 <td>{{ $sale->quantity }}</td>
-                                <td>{{ number_format($sale->product ? $sale->product->price : 0, 2) }}</td>
+                                <td>{{ number_format($sale->price / $sale->quantity, 2) }}</td>
                                 <td>{{ number_format($sale->price, 2) }}</td>
                             </tr>
                         @endforeach
@@ -60,7 +63,7 @@
                 const printWindow = window.open('', '_blank');
                 printWindow.document.write(`
                     <!DOCTYPE html>
-                    <html lang="en">
+                    <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
                     <head>
                         <meta charset="UTF-8">
                         <title>Sale Receipt</title>
@@ -107,7 +110,10 @@
                     <body>
                         <div class="receipt-container">
                             <div class="receipt-header">
-                                <h3>Inventory MS - Sale Receipt</h3>
+                                <h3>{{ auth()->user()->company_name ?? 'Inventory MS' }} - Sale Receipt</h3>
+                                @if (auth()->user()->nif)
+                                    <p><strong>NIF:</strong> {{ auth()->user()->nif }}</p>
+                                @endif
                             </div>
                             <p><strong>Date:</strong> {{ $saleTransaction->created_at ? $saleTransaction->created_at->format('Y-m-d H:i:s') : 'N/A' }}</p>
                             <table class="receipt-table">
@@ -124,7 +130,7 @@
                                         <tr>
                                             <td>{{ $sale->product ? $sale->product->name . ' (' . $sale->product->code . ')' : 'N/A' }}</td>
                                             <td>{{ $sale->quantity }}</td>
-                                            <td>{{ number_format($sale->product ? $sale->product->price : 0, 2) }}</td>
+                                            <td>{{ number_format($sale->price / $sale->quantity, 2) }}</td>
                                             <td>{{ number_format($sale->price, 2) }}</td>
                                         </tr>
                                     @endforeach
@@ -133,8 +139,9 @@
                             <p class="total"><strong>Grand Total:</strong> {{ number_format($saleTransaction->total_amount, 2) }}</p>
                             <p class="customer"><strong>Customer:</strong> {{ $saleTransaction->customer ? $saleTransaction->customer->name : 'N/A' }}</p>
                             <p class="thank-you">Thank you for your purchase!</p>
-                        </body>
-                        </html>
+                        </div>
+                    </body>
+                    </html>
                 `);
                 printWindow.document.close();
                 printWindow.print();
@@ -145,7 +152,10 @@
 @else
     <div class="receipt-container">
         <div class="receipt-header">
-            <h3>Inventory MS - Sale Receipt</h3>
+            <h3>{{ auth()->user()->company_name ?? 'Inventory MS' }} - Sale Receipt</h3>
+            @if (auth()->user()->nif)
+                <p><strong>NIF:</strong> {{ auth()->user()->nif }}</p>
+            @endif
         </div>
         <p><strong>Date:</strong> {{ $saleTransaction->created_at ? $saleTransaction->created_at->format('Y-m-d H:i:s') : 'N/A' }}</p>
         <table class="receipt-table">
@@ -162,7 +172,7 @@
                     <tr>
                         <td>{{ $sale->product ? $sale->product->name . ' (' . $sale->product->code . ')' : 'N/A' }}</td>
                         <td>{{ $sale->quantity }}</td>
-                        <td>{{ number_format($sale->product ? $sale->product->price : 0, 2) }}</td>
+                        <td>{{ number_format($sale->price / $sale->quantity, 2) }}</td>
                         <td>{{ number_format($sale->price, 2) }}</td>
                     </tr>
                 @endforeach

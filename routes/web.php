@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\SettingsController;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -51,20 +52,19 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('customers', CustomerController::class)->middleware('permission:manage customers');
 
     Route::prefix('pos')->group(function () {
-    Route::post('/confirm', [POSController::class, 'confirmSale'])->name('pos.confirm')->middleware('permission:manage sales');
-    Route::delete('/remove-from-cart/{id}', [POSController::class, 'removeFromCart'])->name('pos.remove-from-cart')->middleware('permission:manage sales');
-    Route::delete('/clear-cart', [POSController::class, 'clearCart'])->name('pos.clear-cart')->middleware('permission:manage sales');
-    Route::get('/search-products', [POSController::class, 'searchProducts'])->name('pos.search-products')->middleware('permission:manage sales');
-    Route::post('/add-to-cart', [POSController::class, 'addToCart'])->name('pos.add-to-cart')->middleware('permission:manage sales');
-    Route::get('/', [POSController::class, 'index'])->name('pos.index')->middleware('permission:manage sales');
-    Route::get('/create', [POSController::class, 'create'])->name('pos.create')->middleware('permission:manage sales');
-    Route::post('/store', [POSController::class, 'store'])->name('pos.store')->middleware('permission:manage sales');
-    Route::get('/transaction/{saleTransaction}/edit', [POSController::class, 'edit'])->name('pos.edit')->middleware('permission:manage sales');
-    Route::put('/transaction/{saleTransaction}', [POSController::class, 'update'])->name('pos.update')->middleware('permission:manage sales');
-    Route::delete('/transaction/{saleTransaction}', [POSController::class, 'destroy'])->name('pos.destroy')->middleware('permission:manage sales');
-    Route::get('/transaction/{saleTransaction}/view', [POSController::class, 'view'])->name('pos.view')->middleware('permission:manage sales');
-    Route::post('/test-confirm', [POSController::class, 'confirmSale'])->name('pos.test-confirm')->middleware('permission:manage sales');
-
+        Route::post('/confirm', [POSController::class, 'confirmSale'])->name('pos.confirm')->middleware('permission:manage sales');
+        Route::delete('/remove-from-cart/{id}', [POSController::class, 'removeFromCart'])->name('pos.remove-from-cart')->middleware('permission:manage sales');
+        Route::delete('/clear-cart', [POSController::class, 'clearCart'])->name('pos.clear-cart')->middleware('permission:manage sales');
+        Route::get('/search-products', [POSController::class, 'searchProducts'])->name('pos.search-products')->middleware('permission:manage sales');
+        Route::post('/add-to-cart', [POSController::class, 'addToCart'])->name('pos.add-to-cart')->middleware('permission:manage sales');
+        Route::get('/', [POSController::class, 'index'])->name('pos.index')->middleware('permission:manage sales');
+        Route::get('/create', [POSController::class, 'create'])->name('pos.create')->middleware('permission:manage sales');
+        Route::post('/store', [POSController::class, 'store'])->name('pos.store')->middleware('permission:manage sales');
+        Route::get('/transaction/{saleTransaction}/edit', [POSController::class, 'edit'])->name('pos.edit')->middleware('permission:manage sales');
+        Route::put('/transaction/{saleTransaction}', [POSController::class, 'update'])->name('pos.update')->middleware('permission:manage sales');
+        Route::delete('/transaction/{saleTransaction}', [POSController::class, 'destroy'])->name('pos.destroy')->middleware('permission:manage sales');
+        Route::get('/transaction/{saleTransaction}/view', [POSController::class, 'view'])->name('pos.view')->middleware('permission:manage sales');
+        Route::post('/test-confirm', [POSController::class, 'confirmSale'])->name('pos.test-confirm')->middleware('permission:manage sales');
     });
 
     Route::get('/low-stock', [ProductController::class, 'lowStock'])->name('low_stock')->middleware('permission:manage products');
@@ -87,6 +87,9 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/purchase-orders/{purchaseOrder}/receive', [PurchaseOrderController::class, 'receive'])->name('purchase_orders.receive');
         Route::post('/purchase-orders/{purchaseOrder}/cancel', [PurchaseOrderController::class, 'cancel'])->name('purchase_orders.cancel');
     });
+
+    Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index')->middleware('permission:manage settings');
+    Route::put('/settings', [SettingsController::class, 'update'])->name('settings.update')->middleware('permission:manage settings');
 });
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

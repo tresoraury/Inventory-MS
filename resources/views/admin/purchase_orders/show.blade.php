@@ -9,6 +9,10 @@
             Purchase Order Details
         </div>
         <div class="card-body">
+            <p><strong>Company:</strong> {{ auth()->user()->company_name ?? 'Inventory MS' }}</p>
+            @if (auth()->user()->nif)
+                <p><strong>NIF:</strong> {{ auth()->user()->nif }}</p>
+            @endif
             <p><strong>Supplier:</strong> {{ $purchaseOrder->supplier ? $purchaseOrder->supplier->name : 'N/A' }}</p>
             <p><strong>Total Amount:</strong> {{ number_format($purchaseOrder->total_amount, 2) }}</p>
             <p><strong>Status:</strong> {{ ucfirst($purchaseOrder->status) }}</p>
