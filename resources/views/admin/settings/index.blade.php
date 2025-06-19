@@ -19,7 +19,7 @@
                     {{ session('error') }}
                 </div>
             @endif
-            <form action="{{ route('settings.update') }}" method="POST">
+            <form action="{{ route('settings.update') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
                 <div class="mb-3">
@@ -43,6 +43,32 @@
                     <label for="company_name" class="form-label">Company Name</label>
                     <input type="text" name="company_name" id="company_name" class="form-control" value="{{ old('company_name', auth()->user()->company_name ?? '') }}" maxlength="255">
                     @error('company_name')
+                        <div class="text-danger">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="mb-3">
+                    <label for="logo" class="form-label">Company Logo</label>
+                    <input type="file" name="logo" id="logo" class="form-control" accept="image/*">
+                    @if (auth()->user()->logo)
+                        <div class="mt-2">
+                            <img src="{{ Storage::url(auth()->user()->logo) }}" alt="Company Logo" style="max-width: 100px; max-height: 100px;">
+                        </div>
+                    @endif
+                    @error('logo')
+                        <div class="text-danger">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="mb-3">
+                    <label for="address" class="form-label">Company Address</label>
+                    <textarea name="address" id="address" class="form-control" rows="4" maxlength="500">{{ old('address', auth()->user()->address ?? '') }}</textarea>
+                    @error('address')
+                        <div class="text-danger">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="mb-3">
+                    <label for="version" class="form-label">System Version</label>
+                    <input type="text" name="version" id="version" class="form-control" value="{{ old('version', auth()->user()->version ?? '') }}" maxlength="50">
+                    @error('version')
                         <div class="text-danger">{{ $message }}</div>
                     @enderror
                 </div>

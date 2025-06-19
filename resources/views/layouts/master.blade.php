@@ -40,8 +40,15 @@
             font-weight: 700;
             color: #ffffff !important;
             padding: 15px;
-            display: block;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             text-align: center;
+        }
+        .sidebar-brand img {
+            max-width: 60px;
+            max-height: 60px;
+            object-fit: contain;
         }
         .content-wrapper {
             margin-left: 250px;
@@ -127,7 +134,11 @@
     </button>
 
     <div class="sidebar no-print">
-        <a class="sidebar-brand" href="{{ route('dashboard') }}">{{ auth()->user()->company_name ?? 'Inventory MS' }}</a>
+        <a class="sidebar-brand" href="{{ route('dashboard') }}">
+            @if (auth()->user()->logo)
+                <img src="{{ Storage::url(auth()->user()->logo) }}" alt="Company Logo">
+            @endif
+        </a>
         <ul class="nav flex-column">
             @can('view dashboard')
                 <li class="nav-item">
