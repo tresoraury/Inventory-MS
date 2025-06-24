@@ -23,7 +23,7 @@ class POSController extends Controller
 
     public function index()
     {
-        // Group sales by sale_transaction_id
+        
         $saleTransactions = SaleTransaction::with(['sales.product', 'customer'])->latest()->take(10)->get();
         return view('pos.index', compact('saleTransactions'));
     }
@@ -161,7 +161,7 @@ class POSController extends Controller
                 return redirect()->route('pos.create')->with('error', 'Cart is empty.');
             }
 
-            // Calculate total amount for the transaction
+            // total amount for the transaction
             $totalAmount = 0;
             foreach ($cartItems as $item) {
                 $totalAmount += $item->product->price * $item->quantity;
@@ -172,7 +172,7 @@ class POSController extends Controller
                 return redirect()->route('pos.create')->with('error', 'Total transaction amount exceeds maximum allowed value.');
             }
 
-            // Create a new SaleTransaction
+            // Create new SaleTransaction
             $saleTransaction = SaleTransaction::create([
                 'customer_id' => $request->customer_id,
                 'total_amount' => $totalAmount,
@@ -262,7 +262,7 @@ class POSController extends Controller
                 return redirect()->route('pos.index')->with('error', 'Total price exceeds maximum allowed value.');
             }
 
-            // Create a SaleTransaction for a single product sale
+            // Create SaleTransaction for a single product sale
             $saleTransaction = SaleTransaction::create([
                 'customer_id' => $request->customer_id,
                 'total_amount' => $totalPrice,
@@ -329,7 +329,7 @@ class POSController extends Controller
                 'customer_id' => 'nullable|exists:customers,id',
             ]);
 
-            // Restore stock for existing sale items
+            
             foreach ($saleTransaction->sales as $sale) {
                 $product = $sale->product;
                 $product->stock_quantity += $sale->quantity;
@@ -385,7 +385,7 @@ class POSController extends Controller
                 $saleIds[] = $sale->id;
             }
 
-            // Update the sale transaction
+            
             $saleTransaction->update([
                 'customer_id' => $request->customer_id,
                 'total_amount' => $totalAmount,

@@ -84,17 +84,6 @@
                                 <td>{{ $item->quantity }}</td>
                                 <td>{{ $item->product ? number_format($item->product->price, 2) : 'N/A' }}</td>
                                 <td>{{ $item->product ? number_format($item->product->price * $item->quantity, 2) : 'N/A' }}</td>
-                                <td>
-                                    <!-- Remove button disabled; use Clear Cart instead -->
-                                    <!--
-                                    <form action="{{ route('pos.remove-from-cart', $item->id) }}" method="POST" class="remove-item-form" style="display:inline;">
-                                        @csrf
-                                        @method('DELETE')
-                                        <input type="hidden" name="cart_item_id" value="{{ $item->id }}">
-                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Remove this item?')">Remove</button>
-                                    </form>
-                                    -->
-                                </td>
                             </tr>
                         @endforeach
                     </tbody>

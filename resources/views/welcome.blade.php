@@ -12,8 +12,8 @@
     <!-- Styles -->
     <style>
         body {
-            background-color: #f0f0f0; /* Light grey background */
-            color: #333; /* Dark text for contrast */
+            background-color: #f0f0f0; 
+            color: #333; 
             font-family: 'Raleway', sans-serif;
             margin: 0;
             display: flex;
@@ -27,13 +27,13 @@
 
         h1 {
             font-size: 48px;
-            color: #FF5722; /* Red-orange */
+            color: #FF5722; 
             margin-bottom: 15px;
         }
 
         p {
             font-size: 20px;
-            color: #555; /* Dark grey */
+            color: #555; 
             margin-bottom: 40px;
         }
 
@@ -41,11 +41,11 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 15px; /* Space between links */
+            gap: 15px; 
         }
 
         .links > a {
-            color: #2196F3; /* Blue */
+            color: #2196F3; 
             padding: 15px 30px;
             font-size: 18px;
             font-weight: 700;

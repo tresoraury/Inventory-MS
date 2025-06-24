@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Http\Controllers;
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -10,6 +8,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Config; 
 
 class SettingsController extends Controller
 {
@@ -20,13 +19,22 @@ class SettingsController extends Controller
 
     public function index()
     {
-        Log::debug('Settings index accessed', ['user_id' => Auth::id(), 'locale' => App::getLocale()]);
+        Log::info('Settings index accessed', [
+            'user_id' => Auth::id(),
+            'locale' => App::getLocale(),
+            'session_locale' => Session::get('locale'),
+            'user_language' => Auth::user()->language ?? 'none'
+        ]);
         return view('admin.settings.index');
     }
 
     public function update(Request $request)
     {
-        Log::debug('Settings update attempt', ['input' => $request->all(), 'current_locale' => App::getLocale()]);
+        Log::info('Settings update attempt', [
+            'input' => $request->all(),
+            'current_locale' => App::getLocale(),
+            'session_locale' => Session::get('locale')
+        ]);
 
         try {
             $request->validate([
@@ -47,54 +55,61 @@ class SettingsController extends Controller
                 'version' => $request->version,
             ];
 
-            // Handle logo upload
+            
             if ($request->hasFile('logo')) {
-                // Check directory permissions
                 $directory = storage_path('app/public/logos');
                 if (!is_writable($directory)) {
                     Log::error('Logo upload failed: Directory not writable', ['directory' => $directory]);
-                    throw new \Exception('Logo upload failed: Storage directory is not writable.');
+                    throw new \Exception(__('messages.logo_upload_failed'));
                 }
-
-                // Delete old logo if exists
                 if ($user->logo && Storage::exists('public/' . $user->logo)) {
                     Storage::delete('public/' . $user->logo);
-                    Log::debug('Old logo deleted', ['path' => $user->logo]);
+                    Log::info('Old logo deleted', ['path' => $user->logo]);
                 }
-
-                // Store new logo
                 $path = $request->file('logo')->store('logos', 'public');
                 $data['logo'] = $path;
-                Log::debug('Logo uploaded', ['path' => $path]);
+                Log::info('Logo uploaded', ['path' => $path]);
             }
 
             $updated = $user->update($data);
-
             if ($updated) {
-                Log::info('User settings updated', ['user_id' => $user->id, 'data' => $data]);
                 
-                Session::forget('locale');
-                Cache::flush();
-                Artisan::call('cache:clear');
-                Artisan::call('clear-compiled');
-                Session::regenerate();
-                Auth::login($user);
+                $freshUser = $user->fresh();
+                Auth::setUser($freshUser);
+
                 
                 App::setLocale($request->language);
                 Session::put('locale', $request->language);
-                Log::debug('Locale set in controller', [
-                    'locale' => $request->language,
-                    'applied' => App::getLocale(),
-                    'session' => Session::get('locale')
+
+                
+                Cache::flush();
+                Artisan::call('cache:clear');
+                Artisan::call('config:clear');
+
+                Log::info('User settings updated and locale set', [
+                    'user_id' => $user->id,
+                    'email' => $user->email,
+                    'data' => $data,
+                    'locale' => App::getLocale(),
+                    'session_locale' => Session::get('locale'),
+                    'config_locale' => Config::get('app.locale'),
+                    'user_language' => $freshUser->language
                 ]);
-                return redirect()->route('settings.index')->with('success', 'Settings updated successfully.');
+
+                return redirect()->route('settings.index')
+                    ->with('success', __('messages.settings_updated'));
             } else {
                 Log::error('Failed to update settings', ['user_id' => $user->id]);
-                return redirect()->route('settings.index')->with('error', 'Failed to update settings.');
+                return redirect()->route('settings.index')
+                    ->with('error', __('messages.settings_failed'));
             }
         } catch (\Exception $e) {
-            Log::error('Settings update exception', ['error' => $e->getMessage(), 'user_id' => Auth::id()]);
-            return redirect()->route('settings.index')->with('error', 'An error occurred: ' . $e->getMessage());
+            Log::error('Settings update exception', [
+                'error' => $e->getMessage(),
+                'user_id' => Auth::id()
+            ]);
+            return redirect()->route('settings.index')
+                ->with('error', __('messages.settings_error', ['error' => $e->getMessage()]));
         }
     }
 }
